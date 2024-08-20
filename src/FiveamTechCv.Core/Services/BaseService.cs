@@ -22,8 +22,7 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
     public virtual async Task<string> CreateAsync(T node)
     {
         node.Id = Guid.NewGuid().ToString();
-        node.CreatedAt = DateTime.UtcNow;
-        node.UpdatedAt = DateTime.UtcNow;
+        node.UpdatedAt = DateTime.UtcNow.Ticks;
 
         var param = node.ConvertToParameters();
         
@@ -38,7 +37,7 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
 
     public virtual async Task<T> UpdateAsync(T node)
     {
-        node.UpdatedAt = DateTime.UtcNow;
+        node.UpdatedAt = DateTime.UtcNow.Ticks;
         var (query, _) = await _driver.ExecutableQuery(
                 $"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id SET n += $props RETURN n"
             ).WithParameters(new { id = node.Id, props = node.ConvertToParameters() })
