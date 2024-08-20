@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
-public abstract class BaseController<TEntity, TFilter> : ControllerBase
+public abstract class BaseController<TEntity, TFilter, TDto> : ControllerBase
     where TEntity : BaseNode
     where TFilter : INodeFilter
+    where TDto : BaseDto<TEntity>
 {
     internal readonly INodeService<TEntity, TFilter> _service;
     
@@ -44,15 +45,18 @@ public abstract class BaseController<TEntity, TFilter> : ControllerBase
     }
     
     [HttpPost]
-    public virtual async Task<string> CreateAsync(TEntity entity)
+    public virtual async Task<string> CreateAsync(TDto dto)
     {
-        var result = await _service.CreateAsync(entity);
+        var result = await _service.CreateAsync(dto.ToEntity());
         return result;
     }
     
-    [HttpPut]
-    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
+    [HttpPut("{id}")]
+    public virtual async Task<TEntity> UpdateAsync(string id, TDto dto)
     {
+        var entity = dto.ToEntity();
+        entity.Id = id;
+        
         var result = await _service.UpdateAsync(entity);
         return result;
     }

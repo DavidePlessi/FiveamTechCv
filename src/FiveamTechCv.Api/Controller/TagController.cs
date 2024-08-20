@@ -1,5 +1,6 @@
 ﻿using FiveamTechCv.Abstract.Filters;
 using FiveamTechCv.Abstract.Services;
+using FiveamTechCv.Entities.DTO;
 using FiveamTechCv.Entities.Nodes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,19 +8,18 @@ namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
 [Route("api/tag")]
-public class TagController : BaseController<Tag, TagFilter>
+public class TagController : BaseController<Tag, TagFilter, TagDto>
 {
     public TagController(ITagService service) : base(service)
     {
     }
 
     [HttpPost]
-    public override async Task<string> CreateAsync(Tag entity)
+    public override async Task<string> CreateAsync(TagDto dto)
     {
-        var entityId = await base.CreateAsync(entity);
-        var projectIds = (entity.Projects ?? [])
-            .Where(t => !string.IsNullOrEmpty(t.Id))
-            .Select(tag => tag.Id ?? "")
+        var entityId = await base.CreateAsync(dto);
+        var projectIds = (dto.ProjectIdsToLink ?? [])
+            .Where(p => !string.IsNullOrEmpty(p))
             .ToArray();
 
         if (projectIds.Length > 0)
