@@ -9,7 +9,7 @@ public class WorkExperience : BaseNode
     public string? Position { get; set; }
     public string? Description { get; set; }
     public long StartDate { get; set; }
-    public long EndDate { get; set; }
+    public long? EndDate { get; set; }
     
     [Neo4JRelationship("HAS_PROJECT")]
     [ParameterType(ParameterTypes.Ignore)]
