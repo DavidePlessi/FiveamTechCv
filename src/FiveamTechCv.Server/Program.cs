@@ -6,6 +6,7 @@ using FiveamTechCv.Core;
 using FiveamTechCv.Core.Services;
 using FiveamTechCv.Entities.Nodes;
 using FiveamTechCv.Graph;
+using FiveamTechCv.Server.Middlewares;
 using HotChocolate.Data.Neo4J;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -112,6 +113,8 @@ app.UseFiveamTechCvApi();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors(corsPolicy);
+
+app.UseExceptionHandlerMiddleware();
 
 app.UseEndpoints(ep =>
 {

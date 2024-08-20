@@ -511,3 +511,4 @@ app.*.symbols
 !.vscode/settings.json
 
 /src/FiveamTechCv.Server/appsettings.Development.json
+/src/FiveamTechCv.Server/appsettings.Production.json
