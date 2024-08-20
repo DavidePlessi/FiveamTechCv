@@ -10,7 +10,7 @@ namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
 [Route("api/user")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(IUserService userService, IWebHostEnvironment env) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<string> LoginAsync([FromBody] LoginModel model)
@@ -28,11 +28,20 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPost("create-user")]
-    [Authorize]
+    // [Authorize]
     public async Task<string> CreateUser(CreateUserModel data)
     {
-        var isAdmin = User.Claims.FirstOrDefault(c => c.Type == "IsAdmin")?.Value == "true";
+        var isAuthorized = env.IsDevelopment() || User.Identity?.IsAuthenticated == true;
+        if(!isAuthorized)
+        {
+            throw new FiveamTechCvException(
+                HttpStatusCode.Unauthorized,
+                FiveamTechCvException.Unauthorized,
+                "Unauthorized action"
+            );
+        }
         
+        var isAdmin = env.IsDevelopment() || User.Claims.FirstOrDefault(c => c.Type == "IsAdmin")?.Value == "true";
         if(!isAdmin)
         {
             throw new FiveamTechCvException(
@@ -50,6 +59,6 @@ public class UserController(IUserService userService) : ControllerBase
             IsAdmin = data.IsAdmin
         });
         
-        return result.ToString();
+        return result;
     }
 }
