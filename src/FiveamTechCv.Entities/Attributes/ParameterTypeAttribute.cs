@@ -3,7 +3,8 @@
 public enum ParameterTypes
 {
     Ignore,
-    String
+    String,
+    Long
 }
 
 public class ParameterTypeAttribute : Attribute

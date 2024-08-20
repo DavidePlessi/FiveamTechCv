@@ -7,15 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
-[Route("api/tag")]
-public class TagController : BaseController<Tag, TagFilter, TagDto>
+[Route("api/work-experience")]
+public class WorkExperienceController : BaseController<WorkExperience, WorkExperienceFilter, WorkExperienceDto>
 {
-    public TagController(ITagService service) : base(service)
+    public WorkExperienceController(IWorkExperienceService service) : base(service)
     {
     }
 
     [HttpPost]
-    public override async Task<string> CreateAsync(TagDto dto)
+    public override async Task<string> CreateAsync(WorkExperienceDto dto)
     {
         var entityId = await base.CreateAsync(dto);
         var projectIds = (dto.ProjectIdsToLink ?? [])
@@ -28,8 +28,7 @@ public class TagController : BaseController<Tag, TagFilter, TagDto>
                 entityId, 
                 projectIds, 
                 typeof(Project), 
-                Project.HAS_TAG,
-                true
+                WorkExperience.HAS_PROJECT
             );
         }
 
@@ -46,9 +45,8 @@ public class TagController : BaseController<Tag, TagFilter, TagDto>
         return await _service.CreateRelationAsync(
             fromId, 
             toId, 
-            typeof(Tag),
-            Project.HAS_TAG,
-            true
+            typeof(Project), 
+            WorkExperience.HAS_PROJECT
         );
     }
 }

@@ -12,4 +12,7 @@ public class Project : BaseNode
     [ParameterType(ParameterTypes.Ignore)]
     public List<Tag>? Tags { get; set; }
     
+    // To Tag
+    public const string HAS_TAG = "HAS_TAG";
+    
 }

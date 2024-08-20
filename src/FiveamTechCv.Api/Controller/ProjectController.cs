@@ -29,14 +29,14 @@ public class ProjectController : BaseController<Project, ProjectFilter, ProjectD
                 entityId, 
                 tagId, 
                 typeof(Tag), 
-                "HAS_TAG"
+                Project.HAS_TAG
             );
         }
 
         return entityId;
     }
 
-    [HttpPost("/{fromId}/relate-tag")]
+    [HttpPost("{fromId}/relate-tag")]
     public async Task<int> CreateRelationAsync(
         string fromId, 
         string[] toId
@@ -46,7 +46,7 @@ public class ProjectController : BaseController<Project, ProjectFilter, ProjectD
             fromId, 
             toId, 
             typeof(Tag), 
-            "HAS_TAG"
+            Project.HAS_TAG
         );
     }
 }

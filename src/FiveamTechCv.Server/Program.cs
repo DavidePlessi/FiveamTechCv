@@ -70,6 +70,7 @@ builder.Services
     .AddQueryType(q => q.Name("Query"))
     .AddType<TaqQuery>()
     .AddType<ProjectQuery>()
+    .AddType<WorkExperienceQuery>()
     .AddNeo4JFiltering()
     .AddNeo4JSorting()
     .AddNeo4JProjections();
