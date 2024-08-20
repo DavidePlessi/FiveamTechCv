@@ -1,9 +1,4 @@
-﻿using System.Dynamic;
-using System.Text;
-using FiveamTechCv.Abstract.Filters;
-using Microsoft.Extensions.Primitives;
-
-namespace FiveamTechCv.Abstract.Filters;
+﻿namespace FiveamTechCv.Entities.Filters;
 
 public class UserFilter : BaseNodeFilter
 {

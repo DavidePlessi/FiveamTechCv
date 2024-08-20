@@ -1,7 +1,6 @@
-﻿using FiveamTechCv.Abstract.Filters;
-using FiveamTechCv.Entities.Attributes;
+﻿using FiveamTechCv.Entities.Attributes;
 
-namespace FiveamTechCv.Abstract.Filters;
+namespace FiveamTechCv.Entities.Filters;
 
 public class WorkExperienceFilter : BaseNodeFilter
 {

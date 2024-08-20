@@ -1,5 +1,5 @@
-﻿using FiveamTechCv.Abstract.Filters;
-using FiveamTechCv.Abstract.Services;
+﻿using FiveamTechCv.Abstract.Services;
+using FiveamTechCv.Entities.Filters;
 using FiveamTechCv.Graph;
 
 namespace FiveamTechCv.Core.Services;

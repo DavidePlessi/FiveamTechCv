@@ -1,6 +1,6 @@
-﻿using FiveamTechCv.Abstract.Extensions;
+﻿using FiveamTechCv.Entities.Extensions;
 
-namespace FiveamTechCv.Abstract.Filters;
+namespace FiveamTechCv.Entities.Filters;
 
 public abstract class BaseNodeFilter : INodeFilter
 {

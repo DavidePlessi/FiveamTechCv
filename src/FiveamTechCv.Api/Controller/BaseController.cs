@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using FiveamTechCv.Abstract.Filters;
 using FiveamTechCv.Abstract.Services;
 using FiveamTechCv.Entities;
+using FiveamTechCv.Entities.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiveamTechCv.Api.Controller;

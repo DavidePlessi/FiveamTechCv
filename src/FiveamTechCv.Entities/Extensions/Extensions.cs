@@ -1,11 +1,10 @@
 ﻿using System.Reflection;
 using System.Text.Json;
-using FiveamTechCv.Abstract.Filters;
-using FiveamTechCv.Entities;
 using FiveamTechCv.Entities.Attributes;
+using FiveamTechCv.Entities.Filters;
 using Neo4j.Driver;
 
-namespace FiveamTechCv.Abstract.Extensions;
+namespace FiveamTechCv.Entities.Extensions;
 
 public static class Extensions
 {

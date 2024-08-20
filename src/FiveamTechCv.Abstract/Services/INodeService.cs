@@ -1,5 +1,5 @@
-﻿using FiveamTechCv.Abstract.Filters;
-using FiveamTechCv.Entities;
+﻿using FiveamTechCv.Entities;
+using FiveamTechCv.Entities.Filters;
 
 namespace FiveamTechCv.Abstract.Services;
 

@@ -1,6 +1,6 @@
-﻿using FiveamTechCv.Abstract.Filters;
-using FiveamTechCv.Abstract.Services;
+﻿using FiveamTechCv.Abstract.Services;
 using FiveamTechCv.Entities.DTO;
+using FiveamTechCv.Entities.Filters;
 using FiveamTechCv.Entities.Nodes;
 using Microsoft.AspNetCore.Mvc;
 

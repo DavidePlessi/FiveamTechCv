@@ -1,4 +1,4 @@
-﻿namespace FiveamTechCv.Abstract.Filters;
+﻿namespace FiveamTechCv.Entities.Filters;
 
 public interface INodeFilter
 {

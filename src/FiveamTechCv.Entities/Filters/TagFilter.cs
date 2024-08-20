@@ -1,9 +1,7 @@
-﻿using System.Dynamic;
-using FiveamTechCv.Abstract.Filters;
-using FiveamTechCv.Entities.Attributes;
+﻿using FiveamTechCv.Entities.Attributes;
 using FiveamTechCv.Entities.Nodes;
 
-namespace FiveamTechCv.Abstract.Filters;
+namespace FiveamTechCv.Entities.Filters;
 
 public class TagFilter : BaseNodeFilter
 {
