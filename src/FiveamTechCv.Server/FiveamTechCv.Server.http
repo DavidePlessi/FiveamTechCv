@@ -1,0 +1,6 @@
+@FiveamTechCv.Server_HostAddress = http://localhost:5290
+
+GET {{FiveamTechCv.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
