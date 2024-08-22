@@ -5,6 +5,4 @@
     <!--Command to run on project clean-->
     <CleanCommand> </CleanCommand>
   </PropertyGroup>
-  <ItemGroup>
-  </ItemGroup>
 </Project>

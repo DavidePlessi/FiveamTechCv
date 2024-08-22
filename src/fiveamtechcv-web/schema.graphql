@@ -1,0 +1,166 @@
+﻿type Query {
+    tags(where: TagFilterInput, order: [TagSortInput!]): [Tag!]!
+    projects(where: ProjectFilterInput, order: [ProjectSortInput!]): [Project!]!
+    workExperiences(
+        where: WorkExperienceFilterInput
+        order: [WorkExperienceSortInput!]
+    ): [WorkExperience!]!
+}
+
+input TagFilterInput {
+    and: [TagFilterInput!]
+    or: [TagFilterInput!]
+    name: StringOperationFilterInput
+    type: NullableOfTagTypeOperationFilterInput
+    documentationLink: StringOperationFilterInput
+    projects: ListFilterInputTypeOfProjectFilterInput
+    id: StringOperationFilterInput
+    updatedAt: LongOperationFilterInput
+}
+
+input TagSortInput {
+    name: SortEnumType
+    type: SortEnumType
+    documentationLink: SortEnumType
+    id: SortEnumType
+    updatedAt: SortEnumType
+}
+
+input ProjectFilterInput {
+    and: [ProjectFilterInput!]
+    or: [ProjectFilterInput!]
+    name: StringOperationFilterInput
+    description: StringOperationFilterInput
+    tags: ListFilterInputTypeOfTagFilterInput
+    id: StringOperationFilterInput
+    updatedAt: LongOperationFilterInput
+}
+
+input ProjectSortInput {
+    name: SortEnumType
+    description: SortEnumType
+    id: SortEnumType
+    updatedAt: SortEnumType
+}
+
+input WorkExperienceFilterInput {
+    and: [WorkExperienceFilterInput!]
+    or: [WorkExperienceFilterInput!]
+    company: StringOperationFilterInput
+    position: StringOperationFilterInput
+    description: StringOperationFilterInput
+    startDate: LongOperationFilterInput
+    endDate: LongOperationFilterInput
+    projects: ListFilterInputTypeOfProjectFilterInput
+    id: StringOperationFilterInput
+    updatedAt: LongOperationFilterInput
+}
+
+input WorkExperienceSortInput {
+    company: SortEnumType
+    position: SortEnumType
+    description: SortEnumType
+    startDate: SortEnumType
+    endDate: SortEnumType
+    id: SortEnumType
+    updatedAt: SortEnumType
+}
+
+input StringOperationFilterInput {
+    and: [StringOperationFilterInput!]
+    or: [StringOperationFilterInput!]
+    eq: String
+    neq: String
+    contains: String
+    ncontains: String
+    in: [String]
+    nin: [String]
+    startsWith: String
+    nstartsWith: String
+    endsWith: String
+    nendsWith: String
+}
+
+input NullableOfTagTypeOperationFilterInput {
+    eq: TagType
+    neq: TagType
+    in: [TagType]
+    nin: [TagType]
+}
+
+input ListFilterInputTypeOfProjectFilterInput {
+    all: ProjectFilterInput
+    none: ProjectFilterInput
+    some: ProjectFilterInput
+    any: Boolean
+}
+
+input LongOperationFilterInput {
+    eq: Long
+    neq: Long
+    in: [Long]
+    nin: [Long]
+    gt: Long
+    ngt: Long
+    gte: Long
+    ngte: Long
+    lt: Long
+    nlt: Long
+    lte: Long
+    nlte: Long
+}
+
+enum SortEnumType {
+    ASC
+    DESC
+}
+
+input ListFilterInputTypeOfTagFilterInput {
+    all: TagFilterInput
+    none: TagFilterInput
+    some: TagFilterInput
+    any: Boolean
+}
+
+"""
+The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long
+
+enum TagType {
+    FRAMEWORK
+    LANGUAGE
+    TECHNOLOGY
+    LIBRARY
+    DATABASE
+    PLATFORM
+    AREA
+}
+
+type WorkExperience {
+    company: String
+    position: String
+    description: String
+    startDate: Long!
+    endDate: Long
+    projects: [Project!]
+    id: String
+    updatedAt: Long!
+}
+
+type Project {
+    name: String
+    description: String
+    tags: [Tag!]
+    id: String
+    updatedAt: Long!
+}
+
+type Tag {
+    name: String
+    type: TagType
+    documentationLink: String
+    projects: [Project!]
+    id: String
+    updatedAt: Long!
+}
