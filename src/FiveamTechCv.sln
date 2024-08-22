@@ -10,9 +10,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveamTechCv.Core", "Fiveam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveamTechCv.Graph", "FiveamTechCv.Graph\FiveamTechCv.Graph.csproj", "{1151AF15-CE24-44CD-A652-8E85979FB6DC}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "FiveamTechCv.Web", "FiveamTechCv.Web\FiveamTechCv.Web.esproj", "{E847D6E1-2003-4ABF-81DB-2B407427D433}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveamTechCv.Api", "FiveamTechCv.Api\FiveamTechCv.Api.csproj", "{4A18EE9A-6525-4227-8691-22203A57C9A1}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "FiveamTechCv.Web", "fiveamtechcv-web\FiveamTechCv.Web.esproj", "{299D8A42-176F-42A5-A77B-FB5D6C2253F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,13 +40,13 @@ Global
 		{1151AF15-CE24-44CD-A652-8E85979FB6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1151AF15-CE24-44CD-A652-8E85979FB6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1151AF15-CE24-44CD-A652-8E85979FB6DC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E847D6E1-2003-4ABF-81DB-2B407427D433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E847D6E1-2003-4ABF-81DB-2B407427D433}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E847D6E1-2003-4ABF-81DB-2B407427D433}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{E847D6E1-2003-4ABF-81DB-2B407427D433}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{4A18EE9A-6525-4227-8691-22203A57C9A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4A18EE9A-6525-4227-8691-22203A57C9A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A18EE9A-6525-4227-8691-22203A57C9A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A18EE9A-6525-4227-8691-22203A57C9A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{299D8A42-176F-42A5-A77B-FB5D6C2253F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{299D8A42-176F-42A5-A77B-FB5D6C2253F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{299D8A42-176F-42A5-A77B-FB5D6C2253F2}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{299D8A42-176F-42A5-A77B-FB5D6C2253F2}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal
