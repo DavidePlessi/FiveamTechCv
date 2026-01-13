@@ -5,7 +5,7 @@
 ![Neo4j](https://img.shields.io/badge/Neo4j-Database-008CC1?style=flat&logo=neo4j)
 ![Status](https://img.shields.io/badge/Status-WIP-orange)
 
-**FiveamTechCv** is a full-stack application designed to revolutionize CV management. By leveraging a **graph database**, it simplifies the analysis of professional profiles from multiple perspectives, uncovering connections and insights that traditional formats miss.
+**FiveamTechCv** is a full-stack application designed for CV management. By leveraging a **graph database**, it simplifies the analysis of professional profiles from multiple perspectives, uncovering connections and insights that traditional formats miss.
 
 ---
 
