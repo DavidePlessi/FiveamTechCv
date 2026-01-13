@@ -1,0 +1,8 @@
+﻿#SERVE
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 as runtime
+WORKDIR /app
+
+COPY ../publish /app
+
+ENTRYPOINT [ "dotnet", "/app/FiveamTechCv.Server.dll" ]
+

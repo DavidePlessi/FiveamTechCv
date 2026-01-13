@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="d-flex justify-space-between align-center mb-4">
-      <h1>Tags</h1>
+      <div class="d-flex align-center">
+        <img src="@/assets/logo-nobg.png" alt="Logo" class="view-logo mr-4" />
+        <h1 class="cyber-title">Tags</h1>
+      </div>
       <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
     </div>
 
@@ -15,10 +18,10 @@
       </template>
 
       <template #item.projects="{ item }">
-        <v-chip 
-          v-for="project in item.projects" 
-          :key="project.id" 
-          size="small" 
+        <v-chip
+          v-for="project in item.projects"
+          :key="project.id"
+          size="small"
           class="mr-1 mb-1 cyber-chip"
           color="primary"
           variant="outlined"
@@ -60,6 +63,21 @@
   </div>
 </template>
 
+<style scoped>
+.view-logo {
+    height: 100px;
+    width: auto;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+}
+
+.cyber-title {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 0 !important;
+}
+</style>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -80,6 +98,7 @@ const projects = ref<any[]>([]);
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Type', key: 'type' },
+  { title: 'Order', key: 'order' },
   { title: 'Projects', key: 'projects' },
   { title: 'Actions', key: 'actions', sortable: false },
 ];
@@ -91,13 +110,14 @@ const tagTypeOptions = Object.entries(TagType)
 const tagSchema = ref<FormSchema>({
   fields: [
     { key: 'name', label: 'Name', type: 'text', required: true },
-    { 
-      key: 'type', 
-      label: 'Type', 
-      type: 'select', 
-      options: tagTypeOptions, 
-      required: true 
+    {
+      key: 'type',
+      label: 'Type',
+      type: 'select',
+      options: tagTypeOptions,
+      required: true
     },
+    { key: 'order', label: 'Order', type: 'number' },
     { key: 'documentationLink', label: 'Documentation Link', type: 'text' },
     {
       key: 'projectIdsToLink',

@@ -24,6 +24,7 @@ export interface Tag extends BaseEntity {
     documentationLink?: string;
     projectIdsToLink?: string[];
     projects?: Project[];
+    order?: number;
 }
 
 export interface Project extends BaseEntity {
@@ -31,6 +32,7 @@ export interface Project extends BaseEntity {
     description?: LocalizedString[];
     tagIdsToLink?: string[];
     tags?: Tag[];
+    order?: number;
 }
 
 export interface WorkExperience extends BaseEntity {
@@ -43,7 +45,7 @@ export interface WorkExperience extends BaseEntity {
 }
 
 // Form Schema Types
-export type FieldType = 'text' | 'textarea' | 'select' | 'date' | 'array' | 'object-array' | 'autocomplete';
+export type FieldType = 'text' | 'textarea' | 'select' | 'date' | 'array' | 'object-array' | 'autocomplete' | 'number';
 
 export interface FormField {
     key: string;

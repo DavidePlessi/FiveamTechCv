@@ -1,0 +1,15 @@
+﻿name: "fiveamtech-cv"
+services:
+  app:
+    image: fiveamtech/fiveamtech-cv:latest
+    build:
+      context: ../
+      dockerfile: ./Docker/dockerfile
+    restart: always
+    volumes:
+      - ./log/app:/app/Logs:delegated
+    ports:
+      - 5010:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80

@@ -10,10 +10,10 @@
 
     <!-- Cyber Dock Navigation -->
     <nav class="cyber-dock">
-      <!-- <router-link to="/" class="dock-item" :class="{ active: $route.path === '/' }">
+      <router-link to="/" class="dock-item" :class="{ active: $route.path === '/' }">
         <v-icon>mdi-home</v-icon>
-        <span class="dock-tooltip">Home</span>
-      </router-link> -->
+        <span class="dock-tooltip">Dashboard</span>
+      </router-link>
       <router-link to="/projects" class="dock-item" :class="{ active: $route.path === '/projects' }">
         <v-icon>mdi-rocket-launch</v-icon>
         <span class="dock-tooltip">Projects</span>
@@ -22,7 +22,7 @@
         <v-icon>mdi-tag-multiple</v-icon>
         <span class="dock-tooltip">Tags</span>
       </router-link>
-      
+
       <a v-if="authStore.isAuthenticated" @click="authStore.logout()" class="dock-item" style="cursor: pointer;">
          <v-icon>mdi-logout</v-icon>
          <span class="dock-tooltip">Logout</span>

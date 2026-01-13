@@ -1,0 +1,11 @@
+﻿services:
+  app:
+    image: fiveamtech/fiveamtech-cv:latest
+    restart: always
+    volumes:
+      - ./log/app:/app/Logs:delegated
+    ports:
+      - 5220:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80

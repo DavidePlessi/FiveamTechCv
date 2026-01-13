@@ -6,6 +6,7 @@ namespace FiveamTechCv.Entities.Nodes;
 public class Project : BaseNode
 {
     public string Name { get; set; }
+    public int? Order { get; set; }
     
     [Neo4JRelationship("HAS_DESCRIPTION")]
     [ParameterType(ParameterTypes.Ignore)]

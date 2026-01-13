@@ -6,6 +6,7 @@ namespace FiveamTechCv.Entities.DTO;
 public class ProjectDto : BaseDto<Project>
 {
     public string Name { get; set; }
+    public int? Order { get; set; }
     public List<LocalizedStringDto>? Description { get; set; }
     
     [EntityConversionInfo(true)]

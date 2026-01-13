@@ -52,7 +52,7 @@
             <div class="card-actions mt-3 d-flex justify-end">
               <slot name="item.actions" :item="item"></slot>
             </div>
-            
+
             <!-- Deco Corners -->
             <div class="corner-accent top-right"></div>
             <div class="corner-accent bottom-left"></div>
@@ -97,9 +97,18 @@ const { mobile } = useDisplay();
 const search = ref('');
 
 const filteredItems = computed(() => {
-  if (!search.value) return props.items;
+  let items = [...props.items];
+
+  // Sort by order if available
+  items.sort((a, b) => {
+    const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
+    const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
+  });
+
+  if (!search.value) return items;
   const lowerSearch = search.value.toLowerCase();
-  return props.items.filter(item => 
+  return items.filter(item =>
     item.name?.toLowerCase().includes(lowerSearch)
   );
 });

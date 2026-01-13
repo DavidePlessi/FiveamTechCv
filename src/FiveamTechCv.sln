@@ -14,6 +14,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiveamTechCv.Api", "FiveamT
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "FiveamTechCv.Web", "fiveamtechcv-web\FiveamTechCv.Web.esproj", "{299D8A42-176F-42A5-A77B-FB5D6C2253F2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{FD7433C3-F2BA-41C6-9CC0-CE7F27E48F41}"
+	ProjectSection(SolutionItems) = preProject
+		..\docker\docker-compose.yml = ..\docker\docker-compose.yml
+		..\docker\dockerfile = ..\docker\dockerfile
+		..\docker\build.bat = ..\docker\build.bat
+		..\docker\docker-compose-server.yml = ..\docker\docker-compose-server.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

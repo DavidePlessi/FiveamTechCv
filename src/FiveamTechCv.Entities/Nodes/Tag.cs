@@ -21,6 +21,7 @@ public class Tag : BaseNode
     public string? Name { get; set; }
     public TagType? Type { get; set; }
     public string? DocumentationLink { get; set; }
+    public int? Order { get; set; }
     
     [Neo4JRelationship("HAS_TAG", RelationshipDirection.Incoming)]
     [ParameterType(ParameterTypes.Ignore)]

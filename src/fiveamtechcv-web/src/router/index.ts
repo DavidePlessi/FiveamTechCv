@@ -10,6 +10,7 @@ import LoginPage from '@/views/LoginPage.vue';
 import MainLayout from '@/layouts/MainLayout.vue';
 import ProjectView from '@/views/ProjectView.vue';
 import TagView from '@/views/TagView.vue';
+import DashboardView from '@/views/DashboardView.vue';
 
 const routes = [
   {
@@ -25,7 +26,7 @@ const routes = [
       {
         path: '',
         name: 'Dashboard',
-        component: ProjectView, // Defaulting to Projects for now or a Dashboard placeholder
+        component: DashboardView,
       },
       {
         path: 'projects',

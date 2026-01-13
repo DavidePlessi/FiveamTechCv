@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="d-flex justify-space-between align-center mb-4">
-      <h1>Projects</h1>
+      <div class="d-flex align-center">
+        <img src="@/assets/logo-nobg.png" alt="Logo" class="view-logo mr-4" />
+        <h1 class="cyber-title">Projects</h1>
+      </div>
       <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Project</v-btn>
     </div>
 
@@ -17,10 +20,10 @@
       </template>
 
       <template #item.tags="{ item }">
-        <v-chip 
-            v-for="tag in item.tags" 
-            :key="tag.id" 
-            size="small" 
+        <v-chip
+            v-for="tag in item.tags"
+            :key="tag.id"
+            size="small"
             class="mr-1 cyber-chip"
             color="secondary"
             variant="outlined"
@@ -61,6 +64,21 @@
   </div>
 </template>
 
+<style scoped>
+.view-logo {
+    height: 100px;
+    width: auto;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+}
+
+.cyber-title {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 0 !important;
+}
+</style>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -79,6 +97,7 @@ const tags = ref<any[]>([]);
 
 const headers = [
   { title: 'Name', key: 'name' },
+  { title: 'Order', key: 'order' },
   { title: 'Description', key: 'description' },
   { title: 'Tags', key: 'tags' },
   { title: 'Actions', key: 'actions', sortable: false },
@@ -87,13 +106,14 @@ const headers = [
 const projectSchema = ref<FormSchema>({
   fields: [
     { key: 'name', label: 'Name', type: 'text', required: true },
+    { key: 'order', label: 'Order', type: 'number' },
     {
       key: 'description',
       label: 'Descriptions',
       type: 'object-array',
       itemSchema: {
         fields: [
-          { key: 'language', label: 'Language', type: 'text', required: true }, 
+          { key: 'language', label: 'Language', type: 'text', required: true },
           { key: 'value', label: 'Description', type: 'textarea', required: true },
         ]
       }
@@ -169,8 +189,8 @@ const deleteItem = async (item: Project) => {
      try {
        await projectService.delete(item.id!);
        await loadData();
-     } catch(e) { 
-        console.error('Delete failed', e); 
+     } catch(e) {
+        console.error('Delete failed', e);
      }
   }
 };
