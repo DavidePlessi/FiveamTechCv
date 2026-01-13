@@ -103,13 +103,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+app.UseCors(corsPolicy);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseRouting();
 app.UseFiveamTechCvApi();
 app.UseAuthentication();
@@ -123,7 +126,9 @@ app.UseEndpoints(ep =>
     ep.MapGraphQL();
 });
 
-
-app.UseHttpsRedirection();
+app.UseSpa(spa =>
+{
+    spa.Options.DefaultPage = "/index.html";
+});
 
 app.Run();
