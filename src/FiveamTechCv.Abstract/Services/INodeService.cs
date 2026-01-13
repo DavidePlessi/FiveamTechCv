@@ -20,4 +20,12 @@ public interface INodeService<T, TFilter>
         string relation,
         bool relationIncoming = false
     );
+
+    Task<int> DeleteRelationAsync(
+        string fromId,
+        string[] toId,
+        Type toType,
+        string relation,
+        bool relationIncoming = false
+    );
 }

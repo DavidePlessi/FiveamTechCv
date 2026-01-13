@@ -53,7 +53,7 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
     public virtual async Task<bool> DeleteAsync(string id)
     {
         var (_, resultSummary) = await _driver.ExecutableQuery(
-                $"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id DELETE n"
+                $"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id DETACH DELETE n"
             ).WithParameters(new { id = id })
             .WithConfig(_queryConfig)
             .ExecuteAsync();
@@ -63,9 +63,9 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
 
     public virtual async Task<T?> GetByIdAsync(string id)
     {
-        var (matchClause, returnClause) = BuildMatchAndReturnClauses();
+        var (matchClause, returnClause) = BuildMatchAndReturnClauses(" { Id: $id }");
         
-        var queryStr = $"{matchClause} WHERE n.Id = $id {returnClause}";
+        var queryStr = $"{matchClause} {returnClause}";
 
         var (query, _) = await _driver.ExecutableQuery(queryStr)
             .WithParameters(new { id = id})
@@ -111,10 +111,30 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
 
         return resultSummary.Counters.RelationshipsCreated;
     }
-    
-    private (string MatchClause, string ReturnClause) BuildMatchAndReturnClauses()
+
+    public async Task<int> DeleteRelationAsync(
+        string fromId,
+        string[] toId,
+        Type toType,
+        string relation,
+        bool relationIncoming = false
+    )
     {
-        var matchBuilder = new StringBuilder($"MATCH (n:{typeof(T).Name})");
+        var q = _driver.ExecutableQuery(
+                $"MATCH (from:{typeof(T).Name}){ (relationIncoming ? "<" : "") }-[r:{relation}]-{ (relationIncoming ? "" : ">") }(to:{toType.Name}) " +
+                $"WHERE from.Id = $fromId AND to.Id IN $toId " +
+                $"DELETE r"
+            ).WithParameters(new { fromId = fromId, toId = toId })
+            .WithConfig(_queryConfig);
+
+        var (_, resultSummary) = await q.ExecuteAsync();
+
+        return resultSummary.Counters.RelationshipsDeleted;
+    }
+    
+    private (string MatchClause, string ReturnClause) BuildMatchAndReturnClauses(string? nodeCriteria = null)
+    {
+        var matchBuilder = new StringBuilder($"MATCH (n:{typeof(T).Name}{ nodeCriteria ?? "" })");
         var returnBuilder = new StringBuilder("RETURN n");
         var properties = typeof(T).GetProperties();
         

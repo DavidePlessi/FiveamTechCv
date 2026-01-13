@@ -2,12 +2,14 @@
 using FiveamTechCv.Entities.DTO;
 using FiveamTechCv.Entities.Filters;
 using FiveamTechCv.Entities.Nodes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
 [Route("api/work-experience")]
+[Authorize]
 public class WorkExperienceController : BaseController<WorkExperience, WorkExperienceFilter, WorkExperienceDto>
 {
     public WorkExperienceController(IWorkExperienceService service) : base(service)
