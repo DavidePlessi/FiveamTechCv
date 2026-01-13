@@ -5,8 +5,11 @@ namespace FiveamTechCv.Entities.Nodes;
 
 public class Project : BaseNode
 {
-    public string? Name { get; set; }
-    public string? Description { get; set; }
+    public string Name { get; set; }
+    
+    [Neo4JRelationship("HAS_DESCRIPTION")]
+    [ParameterType(ParameterTypes.Ignore)]
+    public List<LocalizedString>? Description { get; set; }
     
     [Neo4JRelationship("HAS_TAG")]
     [ParameterType(ParameterTypes.Ignore)]
@@ -14,5 +17,6 @@ public class Project : BaseNode
     
     // To Tag
     public const string HAS_TAG = "HAS_TAG";
+    public const string HAS_DESCRIPTION = "HAS_DESCRIPTION";
     
 }

@@ -1,7 +1,7 @@
 ﻿import {BaseEntityService} from "~/services/BaseEntityService";
-import type {ITag, ITagDto, ITagFilter} from "~/entities/entities";
+import type {Tag, TagDto, ITagFilter} from "~/entities/entities";
 
-export class TagService extends BaseEntityService<ITag, ITagFilter, ITagDto> {
+export class TagService extends BaseEntityService<Tag, ITagFilter, TagDto> {
     constructor() {
         super('tag');
     }

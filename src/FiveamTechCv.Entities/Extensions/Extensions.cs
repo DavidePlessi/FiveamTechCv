@@ -2,6 +2,7 @@
 using System.Text.Json;
 using FiveamTechCv.Entities.Attributes;
 using FiveamTechCv.Entities.Filters;
+using HotChocolate.Data.Neo4J;
 using Neo4j.Driver;
 
 namespace FiveamTechCv.Entities.Extensions;
@@ -10,8 +11,84 @@ public static class Extensions
 {
     public static T ConvertToEntity<T>(this IRecord record)
     {
-        var properties = record.Values.Values.First().As<INode>().Properties;
+        var node = record.Values.ContainsKey("n") ? record.Values["n"].As<INode>() : record.Values.Values.First().As<INode>();
+        var properties = node.Properties;
         var typeProperties = typeof(T).GetProperties();
+        var data = new Dictionary<string, object>();
+
+        foreach (var typeProperty in typeProperties)
+        {
+            var parameterTypeAttribute = typeProperty?.GetCustomAttribute<ParameterTypeAttribute>();
+            var propName = parameterTypeAttribute?.PropertyName ?? typeProperty?.Name;
+            
+            // Check if it's a relationship property
+            var relationshipAttr = typeProperty?.GetCustomAttribute<Neo4JRelationshipAttribute>();
+            if (relationshipAttr != null)
+            {
+                // Try to get related nodes from the record
+                // The query should return them as a list of nodes with a key matching the property name or relationship name
+                // For example, if we collect related nodes in the query as 'Name', we look for 'Name' in record
+                if (record.Keys.Contains(typeProperty.Name))
+                {
+                    // Use record.Values to access the value by key to avoid potential issues with indexer
+                    var relatedValue = record.Values[typeProperty.Name];
+                    if (relatedValue != null)
+                    {
+                        var targetType = typeProperty.PropertyType.IsGenericType 
+                            ? typeProperty.PropertyType.GetGenericArguments()[0] 
+                            : typeProperty.PropertyType;
+                            
+                        if (relatedValue is List<object> relatedNodes)
+                        {
+                             var listType = typeof(List<>).MakeGenericType(targetType);
+                             var list = (System.Collections.IList)Activator.CreateInstance(listType)!;
+                             
+                             foreach (var relatedNodeObj in relatedNodes)
+                             {
+                                 if (relatedNodeObj is INode relatedNode)
+                                 {
+                                     var relatedEntity = ConvertNodeToEntity(relatedNode, targetType);
+                                     list.Add(relatedEntity);
+                                 }
+                             }
+                             data.Add(typeProperty.Name, list);
+                        }
+                        else if (relatedValue is INode relatedNode)
+                        {
+                             var relatedEntity = ConvertNodeToEntity(relatedNode, targetType);
+                             data.Add(typeProperty.Name, relatedEntity);
+                        }
+                    }
+                }
+                continue;
+            }
+
+            var value = properties.GetValueOrDefault(propName);
+            
+            var underlyingType = Nullable.GetUnderlyingType(typeProperty.PropertyType);
+            
+            if (underlyingType?.IsEnum == true &&
+                value != null &&
+                value is string
+               )
+            {
+                value = Enum.Parse(underlyingType, value.ToString());
+            }
+            if (value is ZonedDateTime)
+            {
+                value = ((ZonedDateTime)value).ToDateTimeOffset();
+            }
+            data.Add(typeProperty.Name, value);
+            
+        }
+        var json = JsonSerializer.Serialize(data);
+        return JsonSerializer.Deserialize<T>(json);
+    }
+    
+    private static object ConvertNodeToEntity(INode node, Type targetType)
+    {
+        var properties = node.Properties;
+        var typeProperties = targetType.GetProperties();
         var data = new Dictionary<string, object>();
 
         foreach (var typeProperty in typeProperties)
@@ -34,10 +111,9 @@ public static class Extensions
                 value = ((ZonedDateTime)value).ToDateTimeOffset();
             }
             data.Add(typeProperty.Name, value);
-            
         }
         var json = JsonSerializer.Serialize(data);
-        return JsonSerializer.Deserialize<T>(json);
+        return JsonSerializer.Deserialize(json, targetType);
     }
 
     private static object InnerConvertToParameters(object obj, bool ignoreNull = false)

@@ -1,4 +1,4 @@
-﻿import type {ICreateUser, ILoginUser} from "~/entities/entities";
+﻿import type {CreateUser, LoginUser} from "~/entities/entities";
 import {API_URL} from "~/config";
 
 export class UserService {
@@ -29,12 +29,12 @@ export class UserService {
     localStorage.removeItem('token');
   }
   
-  async createUser(data: ICreateUser): Promise<string> {
+  async createUser(data: CreateUser): Promise<string> {
     const response = await axios.post(`${this.url}/create-user`, data);
     return response.data;    
   }
   
-  async login(data: ILoginUser): Promise<string> {
+  async login(data: LoginUser): Promise<string> {
     const response = await axios.post(`${this.url}/login`, data);
     const token = response.data;
     this.setToken(token);

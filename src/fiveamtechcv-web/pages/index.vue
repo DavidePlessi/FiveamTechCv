@@ -1,33 +1,24 @@
 ﻿<template>
-  <div>
-    <div v-for="tag in data?.tags ?? []" :key="tag?.id">
-      <p>{{ tag?.name }}</p>
-      <p>{{ tag?.type }}</p>
-    </div>
-  </div>
+  <entity-form 
+      :submit-form="(e) => console.log(e)" 
+      :entity-class="Tag"  
+      :value="firstTag"
+  />
 </template>
 
 <script setup lang="ts">
+import {Tag, TagType} from "~/entities/entities";
+import EntityForm from "~/components/form/entityForm.vue";
+import {dateToTicks} from "~/utils/dateUtilities";
 
-import type {IQueryResult} from "~/entities/entities";
 
-const query = gql`
-  query GetTags {
-    tags {
-      documentationLink
-      id
-      name
-      type
-      updatedAt
-      projects {
-        description
-        id
-        name
-        updatedAt
-      }
-    }
-  }
-`
+const firstTag = ref<Tag>(new Tag({
+  id: 1,
+  updatedAt: dateToTicks(new Date()),
+  name: 'First Tag',
+  type: TagType.Framework,
+  documentationLink: 'https://www.google.com'
+}));
 
-const {data} = await useAsyncQuery<IQueryResult>(query, {})
+
 </script>

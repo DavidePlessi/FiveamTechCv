@@ -81,6 +81,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IWorkExperienceService, WorkExperienceService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILocalizedStringService, LocalizedStringService>();
 
 builder.Services.AddFiveamTechCvApi(builder.Configuration);
 

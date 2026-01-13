@@ -21,6 +21,29 @@ public class BaseDto<T>
             
             var value = prop.GetValue(this);
             
+            // Handle list of BaseDto conversion to list of BaseNode
+            if (value != null && 
+                value.GetType().IsGenericType && 
+                value.GetType().GetGenericTypeDefinition() == typeof(List<>) &&
+                entityProp.PropertyType.IsGenericType &&
+                entityProp.PropertyType.GetGenericTypeDefinition() == typeof(List<>) &&
+                value.GetType().GetGenericArguments()[0].IsSubclassOf(typeof(BaseDto<>).MakeGenericType(entityProp.PropertyType.GetGenericArguments()[0])))
+            {
+                var listType = typeof(List<>).MakeGenericType(entityProp.PropertyType.GetGenericArguments()[0]);
+                var list = (System.Collections.IList)Activator.CreateInstance(listType)!;
+                
+                foreach (var item in (System.Collections.IEnumerable)value)
+                {
+                    var toEntityMethod = item.GetType().GetMethod("ToEntity");
+                    if (toEntityMethod != null)
+                    {
+                        list.Add(toEntityMethod.Invoke(item, null));
+                    }
+                }
+                entityProp.SetValue(entity, list);
+                continue;
+            }
+            
             entityProp.SetValue(entity, value);
         }
 

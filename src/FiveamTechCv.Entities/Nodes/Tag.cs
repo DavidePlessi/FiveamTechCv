@@ -12,7 +12,8 @@ public enum TagType
     Library,
     Database,
     Platform,
-    Area
+    Area,
+    Category
 }
 
 public class Tag : BaseNode

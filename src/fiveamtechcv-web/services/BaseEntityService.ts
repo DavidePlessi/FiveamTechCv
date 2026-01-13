@@ -1,9 +1,9 @@
 ﻿import {API_URL} from "~/config";
-import type {IBaseEntity, IBaseEntityDto, IBaseEntityFilter} from "~/entities/entities";
+import type {BaseEntity, IBaseEntityDto, BaseEntityFilter} from "~/entities/entities";
 
 export class BaseEntityService<
-  TEntity extends IBaseEntity, 
-  TFilter extends IBaseEntityFilter, 
+  TEntity extends BaseEntity, 
+  TFilter extends BaseEntityFilter, 
   TDto extends IBaseEntityDto
 > {
   constructor(path: string) {
@@ -21,12 +21,12 @@ export class BaseEntityService<
     
   }
   
-  async create(dto: TDto): Promise<string> {
+  async create(dto: TDto|TEntity): Promise<string> {    
     const response = await axios.post(`${this.url}`, dto);
     return response.data;
   }
   
-  async update(id: string, dto: TDto): Promise<TEntity> {
+  async update(id: string, dto: TDto|TEntity): Promise<TEntity> {
     const response = await axios.put(`${this.url}/${id}`, dto);
     return response.data;
   }

@@ -9,60 +9,78 @@
     Area
 }
 
-export interface IBaseEntity {
+export class BaseEntity {
     id?: string;
-    updatedAt?: number;
+    updatedAt?: number|Date;
 }
-export interface IBaseEntityFilter {}
-export interface IBaseEntityDto {}
+export class BaseEntityFilter {}
+export class BaseEntityDto {}
 
-export interface ITag extends IBaseEntity {
+export class Tag extends BaseEntity {
     name?: string;
     type?: TagType;
     documentationLink?: string;
-    projects?: IProject[];    
+    projects?: Project[];    
 }
-export interface ITagFilter extends IBaseEntityFilter {}
-export interface ITagDto extends IBaseEntityDto {}
+export class TagFilter extends BaseEntityFilter {}
+export class TagDto extends BaseEntityDto {}
 
-export interface IProject extends IBaseEntity {
+export class Project extends BaseEntity {
     name?: string;
     description?: string;
-    tags?: ITag[];
+    tags?: Tag[];
 
 }
-export interface IProjectFilter extends IBaseEntityFilter {}
-export interface IProjectDto extends IBaseEntityDto {}
+export class ProjectFilter extends BaseEntityFilter {}
+export class ProjectDto extends BaseEntityDto {}
 
-export interface IWorkExperience extends IBaseEntity {
+export class WorkExperience extends BaseEntity {
     company?: string;
     position?: string;
     description?: string;
-    startDate?: number;
-    endDate?: number;
-    projects?: IProject[];
+    startDate?: number|Date;
+    endDate?: number|Date;
+    projects?: Project[];
 }
-export interface IWorkExperienceFilter extends IBaseEntityFilter {}
-export interface IWorkExperienceDto extends IBaseEntityDto {}
+export class WorkExperienceFilter extends BaseEntityFilter {}
+export class WorkExperienceDto extends BaseEntityDto {}
 
-export interface IUser extends IBaseEntity {
+export class IUser extends BaseEntity {
     username?: string;
 }
 
 
-export interface ICreateUser {
+export class CreateUser {
     username: string;
     password: string;
     isAdmin: boolean;
 }
 
-export interface ILoginUser {
+export class LoginUser {
     username: string;
     password: string;
 }
 
-export interface IQueryResult {
-    tags?: ITag[];
-    projects?: IProject[];
-    workExperiences?: IWorkExperience[];
+export class QueryResult {
+    tags?: Tag[];
+    projects?: Project[];
+    workExperiences?: WorkExperience[];
+}
+
+
+const typeDescriptions = {
+    "tagDto": [{}]
+}
+
+
+export function dtoToEntity<T extends BaseEntity>(dto: BaseEntityDto): T {
+    return dto as T;
+}
+
+export function entityToDto<T extends BaseEntityDto>(entity: BaseEntity): T {
+    return entity as T;
+}
+
+export function getPropertyTypes<T>(obj: T): (keyof T)[] {
+    return Object.keys(obj) as (keyof T)[];
 }

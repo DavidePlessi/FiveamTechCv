@@ -1,8 +1,8 @@
 ﻿import {BaseEntityService} from "~/services/BaseEntityService";
-import type {IProject, IProjectDto, IProjectFilter, ITag, ITagDto, ITagFilter} from "~/entities/entities";
+import type {Project, ProjectDto, ProjectFilter, Tag, TagDto, ITagFilter} from "~/entities/entities";
 
 export class ProjectService 
-  extends BaseEntityService<IProject, IProjectFilter, IProjectDto> 
+  extends BaseEntityService<Project, ProjectFilter, ProjectDto> 
 {
     constructor() {
         super('project');

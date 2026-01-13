@@ -1,11 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import {API_URL} from "~/config";
+import {API_URL} from "./config";
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   typescript: { typeCheck: true },
-  modules: ['@nuxtjs/apollo'],
+  modules: ['@nuxtjs/apollo', "vuetify-nuxt-module"],
   apollo: {
     clients: {
       default: {
