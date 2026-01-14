@@ -22,6 +22,10 @@
         <v-icon>mdi-tag-multiple</v-icon>
         <span class="dock-tooltip">Tags</span>
       </router-link>
+      <router-link to="/graphql" class="dock-item" :class="{ active: $route.path === '/graphql' }">
+        <v-icon>mdi-graphql</v-icon>
+        <span class="dock-tooltip">GraphQL</span>
+      </router-link>
 
       <a v-if="authStore.isAuthenticated" @click="authStore.logout()" class="dock-item" style="cursor: pointer;">
          <v-icon>mdi-logout</v-icon>

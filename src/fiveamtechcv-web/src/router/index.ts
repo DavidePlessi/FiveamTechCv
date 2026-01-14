@@ -11,6 +11,7 @@ import MainLayout from '@/layouts/MainLayout.vue';
 import ProjectView from '@/views/ProjectView.vue';
 import TagView from '@/views/TagView.vue';
 import DashboardView from '@/views/DashboardView.vue';
+import GraphQLView from '@/views/GraphQLView.vue';
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
         path: 'tags',
         name: 'Tags',
         component: TagView,
+      },
+      {
+        path: 'graphql',
+        name: 'GraphQL',
+        component: GraphQLView,
       },
       // {
       //   path: 'work-experiences',

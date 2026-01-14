@@ -23,7 +23,7 @@
           :key="project.id"
           size="small"
           class="mr-1 mb-1 cyber-chip"
-          color="primary"
+          color="secondary"
           variant="outlined"
           label
         >

@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="d-flex align-center mb-6">
       <img src="@/assets/logo-nobg.png" alt="Logo" class="view-logo mr-4" />
-      <h1 class="cyber-title">SYSTEM DASHBOARD</h1>
+      <h1 class="cyber-title">Dashboard</h1>
     </div>
 
     <v-row>
