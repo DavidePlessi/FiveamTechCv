@@ -250,7 +250,7 @@ body {
 }
 
 /* --- HERO HUD SYSTEM --- */
-header {
+.hero-header {
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -477,13 +477,7 @@ h1 {
     }
 }
 
-/* .client-node.hidden {
-    opacity: 0;
-}
 
-.client-node.animate-in {
-    animation: flipInBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-} */
 
 /* --- SECTIONS --- */
 section {
@@ -1239,9 +1233,7 @@ h2::after {
     min-height: 250px;
 }
 
-/* .holo-card.animate-in {
-    animation: flipInCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-} */
+
 
 .holo-card::before {
     content: "";
@@ -1727,11 +1719,7 @@ footer {
     }
 }
 
-/*         #menu-space-fix {
-    width: 100%;
-    height: 110px;
-    background-color: rgba(10, 10, 15, 1);
-} */
+
 
 /* --- SECTION: ABOUT --- */
 #about {
