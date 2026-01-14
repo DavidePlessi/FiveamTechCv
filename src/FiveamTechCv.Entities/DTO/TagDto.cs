@@ -10,6 +10,6 @@ public class TagDto : BaseDto<Tag>
     public string? DocumentationLink { get; set; }
     public int? Order { get; set; }
     
-    [EntityConversionInfo(true)]
+    [EntityConversionInfo(false, "Projects")]
     public List<string>? ProjectIdsToLink { get; set; }
 }

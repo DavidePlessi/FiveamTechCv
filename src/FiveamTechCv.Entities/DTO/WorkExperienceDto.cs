@@ -7,10 +7,16 @@ public class WorkExperienceDto : BaseDto<WorkExperience>
 {
     public string? Company { get; set; }
     public string? Position { get; set; }
-    public string? Description { get; set; }
-    public long? StartDate { get; set; }
-    public long? EndDate { get; set; }
     
-    [EntityConversionInfo(true)]
+    public List<LocalizedStringDto>? Description { get; set; }
+
+    public DateTimeOffset? StartDate { get; set; }
+    public DateTimeOffset? EndDate { get; set; }
+    public int? Order { get; set; }
+    
+    [EntityConversionInfo(false, "Projects")]
     public List<string>? ProjectIdsToLink { get; set; }
+    
+    [EntityConversionInfo(false, "Tags")]
+    public List<string>? TagIdsToLink { get; set; }
 }

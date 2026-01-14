@@ -14,6 +14,10 @@
         <v-icon>mdi-home</v-icon>
         <span class="dock-tooltip">Dashboard</span>
       </router-link>
+      <router-link to="/work-experiences" class="dock-item" :class="{ active: $route.path === '/work-experiences' }">
+        <v-icon>mdi-briefcase</v-icon>
+        <span class="dock-tooltip">Work Experiences</span>
+      </router-link>
       <router-link to="/projects" class="dock-item" :class="{ active: $route.path === '/projects' }">
         <v-icon>mdi-rocket-launch</v-icon>
         <span class="dock-tooltip">Projects</span>

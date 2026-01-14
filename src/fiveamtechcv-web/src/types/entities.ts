@@ -38,10 +38,14 @@ export interface Project extends BaseEntity {
 export interface WorkExperience extends BaseEntity {
     company?: string;
     position?: string;
-    description?: string;
-    startDate?: number;
-    endDate?: number;
+    description?: LocalizedString[];
+    startDate?: string;
+    endDate?: string;
     projectIdsToLink?: string[];
+    projects?: Project[];
+    tagIdsToLink?: string[];
+    tags?: Tag[];
+    order?: number;
 }
 
 // Form Schema Types

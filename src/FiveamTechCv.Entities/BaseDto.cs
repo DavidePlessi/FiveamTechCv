@@ -26,22 +26,49 @@ public class BaseDto<T>
                 value.GetType().IsGenericType && 
                 value.GetType().GetGenericTypeDefinition() == typeof(List<>) &&
                 entityProp.PropertyType.IsGenericType &&
-                entityProp.PropertyType.GetGenericTypeDefinition() == typeof(List<>) &&
-                value.GetType().GetGenericArguments()[0].IsSubclassOf(typeof(BaseDto<>).MakeGenericType(entityProp.PropertyType.GetGenericArguments()[0])))
+                entityProp.PropertyType.GetGenericTypeDefinition() == typeof(List<>))
             {
-                var listType = typeof(List<>).MakeGenericType(entityProp.PropertyType.GetGenericArguments()[0]);
-                var list = (System.Collections.IList)Activator.CreateInstance(listType)!;
+                var inputArgType = value.GetType().GetGenericArguments()[0];
+                var targetArgType = entityProp.PropertyType.GetGenericArguments()[0];
                 
-                foreach (var item in (System.Collections.IEnumerable)value)
+                // Case 1: List<Dto> -> List<Entity>
+                if (inputArgType.IsSubclassOf(typeof(BaseDto<>).MakeGenericType(targetArgType)))
                 {
-                    var toEntityMethod = item.GetType().GetMethod("ToEntity");
-                    if (toEntityMethod != null)
+                    var listType = typeof(List<>).MakeGenericType(targetArgType);
+                    var list = (System.Collections.IList)Activator.CreateInstance(listType)!;
+                    
+                    foreach (var item in (System.Collections.IEnumerable)value)
                     {
-                        list.Add(toEntityMethod.Invoke(item, null));
+                        var toEntityMethod = item.GetType().GetMethod("ToEntity");
+                        if (toEntityMethod != null)
+                        {
+                            list.Add(toEntityMethod.Invoke(item, null));
+                        }
                     }
+                    entityProp.SetValue(entity, list);
+                    continue;
                 }
-                entityProp.SetValue(entity, list);
-                continue;
+                
+                // Case 2: List<string> -> List<Entity> (Ids)
+                if (inputArgType == typeof(string) && targetArgType.IsSubclassOf(typeof(BaseNode)))
+                {
+                    var listType = typeof(List<>).MakeGenericType(targetArgType);
+                    var list = (System.Collections.IList)Activator.CreateInstance(listType)!;
+                    
+                    foreach (string id in (System.Collections.IEnumerable)value)
+                    {
+                        if (string.IsNullOrEmpty(id)) continue;
+                        
+                        var node = Activator.CreateInstance(targetArgType) as BaseNode;
+                        if (node != null)
+                        {
+                            node.Id = id;
+                            list.Add(node);
+                        }
+                    }
+                    entityProp.SetValue(entity, list);
+                    continue;
+                }
             }
             
             entityProp.SetValue(entity, value);

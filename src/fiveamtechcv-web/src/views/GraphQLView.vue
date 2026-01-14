@@ -8,6 +8,7 @@
           <v-card-title class="d-flex align-center justify-space-between py-2 px-4 bg-surface-variant">
             <span class="text-caption font-weight-bold text-uppercase">Query</span>
             <div class="d-flex ga-2">
+               <v-btn size="x-small" variant="tonal" @click="setExample('workExperiences')">Work Experiences</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('projects')">Projects</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('tags')">Tags</v-btn>
             </div>
@@ -97,6 +98,29 @@ const examples: Record<string, string> = {
     description {
       language
       value
+    }
+    tags {
+      name
+      type
+    }
+  }
+}`,
+  workExperiences: `query {
+  workExperiences(order: [{ order: ASC }]) {
+    company
+    position
+    startDate
+    endDate
+    description {
+      language
+      value
+    }
+    projects {
+      name
+      description {
+        language
+        value
+      }
     }
     tags {
       name

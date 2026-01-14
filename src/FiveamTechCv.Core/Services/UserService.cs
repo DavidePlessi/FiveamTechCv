@@ -20,8 +20,8 @@ public class JwtOptions
     public string Audience { get; set; }
 }
 
-public class UserService(GraphDriver driver, IOptions<JwtOptions> jwtOptions)
-    : BaseService<User, UserFilter>(driver), IUserService
+public class UserService(GraphDriver driver, IOptions<JwtOptions> jwtOptions, IServiceProvider serviceProvider)
+    : BaseService<User, UserFilter>(driver, serviceProvider), IUserService
 {
     private static string GetPasswordHash(string password)
     {

@@ -5,7 +5,8 @@ using FiveamTechCv.Graph;
 
 namespace FiveamTechCv.Core.Services;
 
-public class LocalizedStringService(GraphDriver driver) 
-    : BaseService<LocalizedString, LocalizedStringFilter>(driver), ILocalizedStringService
+public class LocalizedStringService(GraphDriver driver,
+    IServiceProvider serviceProvider) 
+    : BaseService<LocalizedString, LocalizedStringFilter>(driver, serviceProvider), ILocalizedStringService
 {
 }

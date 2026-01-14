@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CyberChip: typeof import('./components/shared/CyberChip.vue')['default']
+    CyberDatepicker: typeof import('./components/shared/CyberDatepicker.vue')['default']
     CyberHeader: typeof import('./components/shared/CyberHeader.vue')['default']
     GenericForm: typeof import('./components/generic/GenericForm.vue')['default']
     GenericList: typeof import('./components/generic/GenericList.vue')['default']

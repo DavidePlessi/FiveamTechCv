@@ -94,7 +94,13 @@ const projectSchema = ref<FormSchema>({
       type: 'object-array',
       itemSchema: {
         fields: [
-          { key: 'language', label: 'Language', type: 'text', required: true },
+          { 
+            key: 'language', 
+            label: 'Language', 
+            type: 'select', 
+            options: ['EN', 'IT', 'ES', 'DE', 'FR'],
+            required: true 
+          },
           { key: 'value', label: 'Description', type: 'textarea', required: true },
         ]
       }

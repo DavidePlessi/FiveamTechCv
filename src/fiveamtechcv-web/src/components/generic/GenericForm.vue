@@ -73,6 +73,14 @@
           density="comfortable"
         ></v-autocomplete>
 
+        <!-- Date Picker -->
+        <cyber-datepicker
+            v-if="field.type === 'date'"
+            v-model="modelValue[field.key]"
+            :label="field.label"
+            :rules="getRules(field)"
+        ></cyber-datepicker>
+
         <!-- Object Array (e.g. LocalizedString) -->
         <div v-if="field.type === 'object-array'" class="cyber-group-container pa-4 rounded">
           <div class="d-flex justify-space-between align-center mb-4">
@@ -269,6 +277,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { FormSchema, FormField } from '@/types/entities';
+import CyberDatepicker from '@/components/shared/CyberDatepicker.vue';
 
 interface Props {
   modelValue: any;

@@ -134,6 +134,10 @@ public static class Extensions
              
             if(attribute is { Type: ParameterTypes.String })
                 value = value.ToString();
+            
+             
+            if(attribute is { Type: ParameterTypes.ZoneDateTime } && value is DateTimeOffset offset)
+                value = new ZonedDateTime(offset);
              
             if(value is Enum)
                 value = value.ToString();

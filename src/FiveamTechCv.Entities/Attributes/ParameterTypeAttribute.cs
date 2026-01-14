@@ -4,7 +4,8 @@ public enum ParameterTypes
 {
     Ignore,
     String,
-    Long
+    Long,
+    ZoneDateTime
 }
 
 public class ParameterTypeAttribute : Attribute

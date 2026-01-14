@@ -44,11 +44,11 @@ const routes = [
         name: 'GraphQL',
         component: GraphQLView,
       },
-      // {
-      //   path: 'work-experiences',
-      //   name: 'WorkExperiences',
-      //   component: () => import('@/views/WorkExperienceView.vue'),
-      // },
+      {
+        path: 'work-experiences',
+        name: 'WorkExperiences',
+        component: () => import('@/views/WorkExperienceView.vue'),
+      },
     ],
   },
 ];

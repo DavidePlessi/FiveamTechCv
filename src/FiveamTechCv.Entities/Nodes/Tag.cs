@@ -24,6 +24,7 @@ public class Tag : BaseNode
     public int? Order { get; set; }
     
     [Neo4JRelationship("HAS_TAG", RelationshipDirection.Incoming)]
+    [NodeRelationship("HAS_TAG", NodeRelationType.Link, true)]
     [ParameterType(ParameterTypes.Ignore)]
     public List<Project>? Projects { get; set; }
 }
