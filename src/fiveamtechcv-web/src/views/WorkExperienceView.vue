@@ -1,7 +1,7 @@
 <template>
   <div>
     <cyber-header title="Work Experiences">
-        <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Experience</v-btn>
+        <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Experience</v-btn>
     </cyber-header>
 
     <generic-list
@@ -32,8 +32,8 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
-        <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
+        <v-btn v-if="authStore.isAuthenticated" icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
+        <v-btn v-if="authStore.isAuthenticated" icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
       </template>
     </generic-list>
 
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import GenericList from '@/components/generic/GenericList.vue';
 import GenericForm from '@/components/generic/GenericForm.vue';
@@ -73,8 +73,10 @@ import type { WorkExperience, FormSchema } from '@/types/entities';
 import { workExperienceService } from '@/services/workExperienceService';
 import { projectService } from '@/services/projectService';
 import { tagService } from '@/services/tagService';
+import { useAuthStore } from '@/stores/auth';
 
 const { mobile } = useDisplay();
+const authStore = useAuthStore();
 const items = ref<WorkExperience[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
@@ -82,15 +84,20 @@ const editedItem = ref<WorkExperience>({});
 const allProjects = ref<any[]>([]);
 const allTags = ref<any[]>([]);
 
-const headers = [
-  { title: 'Order', key: 'order' },
-  { title: 'Company', key: 'company' },
-  { title: 'Position', key: 'position' },
-  { title: 'Dates', key: 'dates' },
-  { title: 'Projects', key: 'projects' },
-  { title: 'Tags', key: 'tags' },
-  { title: 'Actions', key: 'actions', sortable: false },
-];
+const headers = computed(() => {
+  const baseHeaders = [
+    { title: 'Order', key: 'order' },
+    { title: 'Company', key: 'company' },
+    { title: 'Position', key: 'position' },
+    { title: 'Dates', key: 'dates' },
+    { title: 'Projects', key: 'projects' },
+    { title: 'Tags', key: 'tags' },
+  ];
+  if (authStore.isAuthenticated) {
+    baseHeaders.push({ title: 'Actions', key: 'actions' });
+  }
+  return baseHeaders;
+});
 
 const schema = ref<FormSchema>({
   fields: [
@@ -104,12 +111,12 @@ const schema = ref<FormSchema>({
       type: 'object-array',
       itemSchema: {
         fields: [
-          { 
-            key: 'language', 
-            label: 'Language', 
-            type: 'select', 
+          {
+            key: 'language',
+            label: 'Language',
+            type: 'select',
             options: ['EN', 'IT', 'ES', 'DE', 'FR'],
-            required: true 
+            required: true
           },
           { key: 'value', label: 'Description', type: 'textarea', required: true },
         ]
@@ -135,7 +142,7 @@ const schema = ref<FormSchema>({
 
 const formatDate = (dateValue?: string) => {
     if (!dateValue) return '';
-    // Use ISO string slice to get YYYY-MM-DD. 
+    // Use ISO string slice to get YYYY-MM-DD.
     // Assuming backend sends correct ISO format which parses correctly.
     try {
         return new Date(dateValue).toISOString().slice(0, 10);
@@ -201,11 +208,11 @@ const save = async (item: WorkExperience) => {
     // Usually generic form handles this or backend allows string parsing, but let's check.
     // DTO defines long? StartDate. Backend likely expects unix timestamp or ticks.
     // GenericForm type 'date' usually emits string "YYYY-MM-DD".
-    // I should convert "YYYY-MM-DD" to timestamp before sending if necessary. 
-    // However, looking at TagView or ProjectView might clarify. 
-    // They don't have date fields. 
+    // I should convert "YYYY-MM-DD" to timestamp before sending if necessary.
+    // However, looking at TagView or ProjectView might clarify.
+    // They don't have date fields.
     // Let's assume for now we need to convert to unix timestamp (seconds).
-    
+
     // Payload date is already string (ISO "YYYY-MM-DD") from generic form datepicker
     const payload = { ...item };
 

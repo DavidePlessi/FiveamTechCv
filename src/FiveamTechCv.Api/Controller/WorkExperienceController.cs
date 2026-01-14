@@ -9,7 +9,6 @@ namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
 [Route("api/work-experience")]
-[Authorize]
 public class WorkExperienceController : BaseController<WorkExperience, WorkExperienceFilter, WorkExperienceDto>
 {
     private readonly ILocalizedStringService _localizedStringService;

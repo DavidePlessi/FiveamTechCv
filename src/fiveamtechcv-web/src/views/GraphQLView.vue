@@ -3,12 +3,38 @@
     <cyber-header title="GraphQL Playground" />
 
     <v-row class="flex-grow-1 ma-0 w-100">
-      <v-col cols="12" md="6" class="d-flex flex-column pa-2" style="min-height: 50vh;">
+      <v-col cols="12" md="4" class="d-flex flex-column pa-2" style="min-height: 50vh;">
+        <v-card class="flex-grow-1 d-flex flex-column" elevation="4" border>
+          <v-card-title class="py-2 px-4 bg-surface-variant">
+            <span class="text-caption font-weight-bold text-uppercase">Documentation</span>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text class="flex-grow-1 pa-0 position-relative" style="background-color: #1e1e1e;">
+             <div class="absolute-fill overflow-auto pa-4 custom-scrollbar">
+                <v-expansion-panels variant="accordion" theme="dark">
+                  <v-expansion-panel v-for="(doc, type) in documentation" :key="type" bg-color="#1e1e1e">
+                    <v-expansion-panel-title class="text-subtitle-2 font-weight-bold text-primary">
+                      {{ type }}
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text class="text-caption">
+                      <div v-for="(desc, field) in doc" :key="field" class="mb-2">
+                        <span class="text-secondary font-weight-bold">{{ field }}:</span>
+                        <span class="text-grey-lighten-1 ml-1">{{ desc }}</span>
+                      </div>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+             </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" md="4" class="d-flex flex-column pa-2" style="min-height: 50vh;">
         <v-card class="flex-grow-1 d-flex flex-column" elevation="4" border>
           <v-card-title class="d-flex align-center justify-space-between py-2 px-4 bg-surface-variant">
             <span class="text-caption font-weight-bold text-uppercase">Query</span>
             <div class="d-flex ga-2">
-               <v-btn size="x-small" variant="tonal" @click="setExample('workExperiences')">Work Experiences</v-btn>
+               <v-btn size="x-small" variant="tonal" @click="setExample('workExperiences')">Work Exp</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('projects')">Projects</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('tags')">Tags</v-btn>
             </div>
@@ -49,7 +75,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="6" class="d-flex flex-column pa-2" style="min-height: 50vh;">
+      <v-col cols="12" md="4" class="d-flex flex-column pa-2" style="min-height: 50vh;">
         <v-card class="flex-grow-1 d-flex flex-column" elevation="4" border>
           <v-card-title class="py-2 px-4 bg-surface-variant">
             <span class="text-caption font-weight-bold text-uppercase">Result</span>
@@ -90,6 +116,36 @@ const query = ref(`query {
 const results = ref('// Results will appear here...');
 const loading = ref(false);
 const isError = ref(false);
+
+const documentation = {
+  WorkExperience: {
+    company: "String - Name of the company",
+    position: "String - Job title/position",
+    startDate: "DateTime - Start date of employment",
+    endDate: "DateTime - End date of employment (null if current)",
+    order: "Int - Display order",
+    description: "[LocalizedString] - Localized job descriptions",
+    projects: "[Project] - Projects worked on during this role",
+    tags: "[Tag] - General tag associated"
+  },
+  Project: {
+    name: "String - Name of the project",
+    order: "Int - Display order",
+    description: "[LocalizedString] - Localized project descriptions",
+    tags: "[Tag] - General tag associated"
+  },
+  Tag: {
+    name: "String - Name of the technology/skill",
+    type: "TagType - Category (Framework, Language, Category, Area, etc.)",
+    documentationLink: "String - URL to official documentation",
+    order: "Int - Display order",
+    projects: "[Project] - Projects using this tag"
+  },
+  LocalizedString: {
+    language: "String - Language code (e.g., 'en', 'it')",
+    value: "String - The localized text content"
+  }
+};
 
 const examples: Record<string, string> = {
   projects: `query {

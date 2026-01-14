@@ -1,7 +1,7 @@
 <template>
   <div>
     <cyber-header title="Projects">
-        <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Project</v-btn>
+        <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Project</v-btn>
     </cyber-header>
 
     <generic-list
@@ -24,8 +24,8 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
-        <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
+        <v-btn v-if="authStore.isAuthenticated" icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
+        <v-btn v-if="authStore.isAuthenticated" icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
       </template>
     </generic-list>
 
@@ -59,7 +59,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import GenericList from '@/components/generic/GenericList.vue';
 import GenericForm from '@/components/generic/GenericForm.vue';
@@ -68,21 +68,28 @@ import CyberChip from '@/components/shared/CyberChip.vue';
 import type { Project, FormSchema } from '@/types/entities';
 import { projectService } from '@/services/projectService';
 import { tagService } from '@/services/tagService';
+import { useAuthStore } from '@/stores/auth';
 
 const { mobile } = useDisplay();
+const authStore = useAuthStore();
 const projects = ref<Project[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
 const editedItem = ref<Project>({ name: '', description: [], tagIdsToLink: [] });
 const tags = ref<any[]>([]);
 
-const headers = [
-  { title: 'Name', key: 'name' },
-  { title: 'Order', key: 'order' },
-  { title: 'Description', key: 'description' },
-  { title: 'Tags', key: 'tags' },
-  { title: 'Actions', key: 'actions', sortable: false },
-];
+const headers = computed(() => {
+  const baseHeaders = [
+    { title: 'Name', key: 'name' },
+    { title: 'Order', key: 'order' },
+    { title: 'Description', key: 'description' },
+    { title: 'Tags', key: 'tags' },
+  ];
+  if (authStore.isAuthenticated) {
+    baseHeaders.push({ title: 'Actions', key: 'actions' });
+  }
+  return baseHeaders;
+});
 
 const projectSchema = ref<FormSchema>({
   fields: [
@@ -94,12 +101,12 @@ const projectSchema = ref<FormSchema>({
       type: 'object-array',
       itemSchema: {
         fields: [
-          { 
-            key: 'language', 
-            label: 'Language', 
-            type: 'select', 
+          {
+            key: 'language',
+            label: 'Language',
+            type: 'select',
             options: ['EN', 'IT', 'ES', 'DE', 'FR'],
-            required: true 
+            required: true
           },
           { key: 'value', label: 'Description', type: 'textarea', required: true },
         ]

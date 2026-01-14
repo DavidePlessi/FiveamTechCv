@@ -9,7 +9,6 @@ namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
 [Route("api/tag")]
-[Authorize]
 public class TagController : BaseController<Tag, TagFilter, TagDto>
 {
     public TagController(ITagService service) : base(service)

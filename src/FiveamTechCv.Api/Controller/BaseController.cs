@@ -4,6 +4,7 @@ using FiveamTechCv.Abstract.Services;
 using FiveamTechCv.Entities;
 using FiveamTechCv.Entities.Attributes;
 using FiveamTechCv.Entities.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FiveamTechCv.Api.Controller;
@@ -47,6 +48,7 @@ public abstract class BaseController<TEntity, TFilter, TDto> : ControllerBase
     }
     
     [HttpPost]
+    [Authorize]
     public virtual async Task<string> CreateAsync(TDto dto)
     {
         var result = await _service.CreateAsync(dto.ToEntity());
@@ -54,6 +56,7 @@ public abstract class BaseController<TEntity, TFilter, TDto> : ControllerBase
     }
     
     [HttpPut("{id}")]
+    [Authorize]
     public virtual async Task<TEntity> UpdateAsync(string id, TDto dto)
     {
         var entity = dto.ToEntity();
@@ -64,6 +67,7 @@ public abstract class BaseController<TEntity, TFilter, TDto> : ControllerBase
     }
     
     [HttpDelete("{id}")]
+    [Authorize]
     public virtual async Task<bool> DeleteAsync(string id)
     {
         var result = await _service.DeleteAsync(id);

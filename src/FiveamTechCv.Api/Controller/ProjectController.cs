@@ -14,7 +14,6 @@ namespace FiveamTechCv.Api.Controller;
 
 [ApiController]
 [Route("api/project")]
-[Authorize]
 public class ProjectController : BaseController<Project, ProjectFilter, ProjectDto>
 {
     private readonly ILocalizedStringService _localizedStringService;
@@ -35,8 +34,9 @@ public class ProjectController : BaseController<Project, ProjectFilter, ProjectD
         _httpClient = new HttpClient();
     }
 
+
     [HttpPost("update-from-strapi")]
-    [AllowAnonymous]
+    [Authorize]
     public async Task<int> UpdateFromStrapi()
     {
         var response = await _httpClient.GetAsync("https://strapi.fiveamtech.it/projects-data-fts");

@@ -1,7 +1,7 @@
 <template>
   <div>
     <cyber-header title="Tags">
-        <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
+        <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
     </cyber-header>
 
     <generic-list
@@ -23,8 +23,8 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
-        <v-btn icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
+        <v-btn v-if="authStore.isAuthenticated" icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
+        <v-btn v-if="authStore.isAuthenticated" icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
       </template>
     </generic-list>
 
@@ -58,7 +58,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import GenericList from '@/components/generic/GenericList.vue';
 import GenericForm from '@/components/generic/GenericForm.vue';
@@ -68,21 +68,28 @@ import type { Tag, FormSchema } from '@/types/entities';
 import { TagType } from '@/types/entities';
 import { tagService } from '@/services/tagService';
 import { projectService } from '@/services/projectService';
+import { useAuthStore } from '@/stores/auth';
 
 const { mobile } = useDisplay();
+const authStore = useAuthStore();
 const tags = ref<Tag[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
 const editedItem = ref<Tag>({});
 const projects = ref<any[]>([]);
 
-const headers = [
-  { title: 'Name', key: 'name' },
-  { title: 'Type', key: 'type' },
-  { title: 'Order', key: 'order' },
-  { title: 'Projects', key: 'projects' },
-  { title: 'Actions', key: 'actions', sortable: false },
-];
+const headers = computed(() => {
+  const baseHeaders = [
+    { title: 'Name', key: 'name' },
+    { title: 'Type', key: 'type' },
+    { title: 'Order', key: 'order' },
+    { title: 'Projects', key: 'projects' },
+  ];
+  if (authStore.isAuthenticated) {
+    baseHeaders.push({ title: 'Actions', key: 'actions' });
+  }
+  return baseHeaders;
+});
 
 const tagTypeOptions = Object.entries(TagType)
   .filter(([key, value]) => typeof value === 'number')
