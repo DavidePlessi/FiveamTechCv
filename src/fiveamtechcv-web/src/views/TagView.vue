@@ -1,13 +1,13 @@
 <template>
   <div>
-    <cyber-header title="Tags">
-        <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
+    <cyber-header title="Tags" subtitle="Tags allow for flexible categorization of content across the application.">
     </cyber-header>
 
     <generic-list
       :items="tags"
       :headers="headers"
       :loading="loading"
+      :filter-schema="filterSchema"
     >
       <template #item.type="{ item }">
         {{ TagType[item.type] }}
@@ -131,12 +131,32 @@ const loadData = async () => {
     if (projectField) {
         projectField.options = projects.value;
     }
+    
+    // Populate Filter Options
+    const filterProjectField = filterSchema.value.fields.find(f => f.key === 'projects');
+    if (filterProjectField) {
+        filterProjectField.options = projects.value; 
+    }
+
+    const filterTypeField = filterSchema.value.fields.find(f => f.key === 'type');
+    if (filterTypeField) {
+        const usedTypes = new Set(fetchedTags.map(t => t.type).filter(t => t !== undefined));
+        filterTypeField.options = tagTypeOptions.filter(opt => usedTypes.has(opt.value as TagType));
+    }
   } catch (e) {
     console.error('Error loading data', e);
   } finally {
     loading.value = false;
   }
 };
+
+const filterSchema = ref<FormSchema>({
+  fields: [
+    { key: 'name', label: 'Name', type: 'text' },
+    { key: 'type', label: 'Type', type: 'select', options: [] },
+    { key: 'projects', label: 'Project', type: 'select', options: [] }, // Options populated in loadData
+  ]
+});
 
 onMounted(loadData);
 

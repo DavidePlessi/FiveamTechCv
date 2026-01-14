@@ -387,7 +387,6 @@ onMounted(async () => {
 .usage-bar-fill {
     height: 100%;
     background: var(--accent-orange);
-    box-shadow: 0 0 5px currentColor;
     transition: width 1s ease-out;
 }
 

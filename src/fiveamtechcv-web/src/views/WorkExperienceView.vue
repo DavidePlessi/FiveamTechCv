@@ -1,6 +1,9 @@
 <template>
   <div>
     <cyber-header title="Work Experiences">
+        <template #subtitle>
+            Tags in Work Experience highlight specific <strong>Roles</strong> and skills.
+        </template>
         <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Experience</v-btn>
     </cyber-header>
 
@@ -8,19 +11,20 @@
       :items="items"
       :headers="headers"
       :loading="loading"
+      :filter-schema="filterSchema"
     >
       <template #item.dates="{ item }">
         {{ formatDate(item.startDate) }} - {{ item.endDate ? formatDate(item.endDate) : 'Present' }}
       </template>
 
-      <template #item.projects="{ item }">
+      <!-- <template #item.projects="{ item }">
         <cyber-chip
             v-for="project in item.projects"
             :key="project.id"
             :text="project.name"
             icon="mdi-rocket-launch-outline"
         />
-      </template>
+      </template> -->
 
       <template #item.tags="{ item }">
         <cyber-chip
@@ -90,7 +94,7 @@ const headers = computed(() => {
     { title: 'Company', key: 'company' },
     { title: 'Position', key: 'position' },
     { title: 'Dates', key: 'dates' },
-    { title: 'Projects', key: 'projects' },
+    // { title: 'Projects', key: 'projects' },
     { title: 'Tags', key: 'tags' },
   ];
   if (authStore.isAuthenticated) {
@@ -140,6 +144,14 @@ const schema = ref<FormSchema>({
   ]
 });
 
+const filterSchema = ref<FormSchema>({
+  fields: [
+    { key: 'company', label: 'Company', type: 'text' },
+    { key: 'position', label: 'Position', type: 'text' },
+    { key: 'tags', label: 'Tag', type: 'select', options: [] }
+  ]
+});
+
 const formatDate = (dateValue?: string) => {
     if (!dateValue) return '';
     // Use ISO string slice to get YYYY-MM-DD.
@@ -168,6 +180,21 @@ const loadData = async () => {
 
     const tagField = schema.value.fields.find(f => f.key === 'tagIdsToLink');
     if (tagField) tagField.options = allTags.value;
+
+    const filterTagField = filterSchema.value.fields.find(f => f.key === 'tags');
+    if (filterTagField) {
+        // Filter only used Experience Tags
+        const usedTagIds = new Set<string>();
+        items.value.forEach(item => {
+            if (item.tags) {
+                item.tags.forEach(t => {
+                    if (t.id) usedTagIds.add(t.id);
+                });
+            }
+        });
+        
+        filterTagField.options = allTags.value.filter(t => usedTagIds.has(t.value));
+    }
 
   } catch (e) {
     console.error('Error loading data', e);

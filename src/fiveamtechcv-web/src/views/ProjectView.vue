@@ -1,6 +1,9 @@
 <template>
   <div>
     <cyber-header title="Projects">
+        <template #subtitle>
+            Tags in Projects indicate the <strong>Technology</strong> stack and <strong>Category</strong>.
+        </template>
         <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Project</v-btn>
     </cyber-header>
 
@@ -8,6 +11,7 @@
       :items="projects"
       :headers="headers"
       :loading="loading"
+      :filter-schema="filterSchema"
     >
       <template #item.description="{ item }">
         <div v-for="desc in item.description" :key="desc.language">
@@ -122,6 +126,13 @@ const projectSchema = ref<FormSchema>({
   ]
 });
 
+const filterSchema = ref<FormSchema>({
+  fields: [
+    { key: 'name', label: 'Name', type: 'text' },
+    { key: 'tags', label: 'Tag', type: 'select', options: [] }, // Options populated in loadData
+  ]
+});
+
 const loadData = async () => {
   loading.value = true;
   try {
@@ -171,6 +182,21 @@ onMounted(async () => {
         const tagField = projectSchema.value.fields.find(f => f.key === 'tagIdsToLink');
         if (tagField) {
             tagField.options = tags.value;
+        }
+
+        // Populate Filter Options
+        const filterTagField = filterSchema.value.fields.find(f => f.key === 'tags');
+        if (filterTagField) {
+            // Filter only used Project Tags
+            const usedTagIds = new Set<string>();
+            projects.value.forEach(p => {
+                if (p.tags) {
+                    p.tags.forEach(t => {
+                        if (t.id) usedTagIds.add(t.id);
+                    });
+                }
+            });
+            filterTagField.options = tags.value.filter(t => usedTagIds.has(t.value));
         }
     } catch (e) {
         console.error('Error loading data', e);
