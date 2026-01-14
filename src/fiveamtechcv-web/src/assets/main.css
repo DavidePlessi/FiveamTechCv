@@ -1308,6 +1308,7 @@ h2::after {
     border: 2px solid var(--accent-pink);
     opacity: 0.5;
     transition: 0.3s;
+    pointer-events: none;
 }
 
 .top-right {
@@ -1894,10 +1895,11 @@ footer {
 .holo-card.simulate-hover .corner-accent {
     animation: autoHoverAccent 1.5s ease-in-out forwards;
 }
+
 /* --- CYBER CHIPS --- */
 .cyber-chip {
     border: 1px solid currentColor;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
     font-family: var(--code-font);
     letter-spacing: 0.5px;

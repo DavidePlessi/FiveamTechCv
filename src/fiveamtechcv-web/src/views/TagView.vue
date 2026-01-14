@@ -1,12 +1,8 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center mb-4">
-      <div class="d-flex align-center">
-        <img src="@/assets/logo-nobg.png" alt="Logo" class="view-logo mr-4" />
-        <h1 class="cyber-title">Tags</h1>
-      </div>
-      <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
-    </div>
+    <cyber-header title="Tags">
+        <v-btn color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
+    </cyber-header>
 
     <generic-list
       :items="tags"
@@ -18,18 +14,12 @@
       </template>
 
       <template #item.projects="{ item }">
-        <v-chip
-          v-for="project in item.projects"
-          :key="project.id"
-          size="small"
-          class="mr-1 mb-1 cyber-chip"
-          color="secondary"
-          variant="outlined"
-          label
-        >
-            <v-icon start size="x-small">mdi-rocket-launch-outline</v-icon>
-            {{ project.name }}
-        </v-chip>
+        <cyber-chip
+            v-for="project in item.projects"
+            :key="project.id"
+            :text="project.name"
+            icon="mdi-rocket-launch-outline"
+        />
       </template>
 
       <template #item.actions="{ item }">
@@ -64,18 +54,7 @@
 </template>
 
 <style scoped>
-.view-logo {
-    height: 100px;
-    width: auto;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
-}
-
-.cyber-title {
-    color: #fff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    letter-spacing: 2px;
-    margin-bottom: 0 !important;
-}
+/* Scoped styles removed in favor of global cyber.css and shared components */
 </style>
 
 <script setup lang="ts">
@@ -83,6 +62,8 @@ import { ref, onMounted } from 'vue';
 import { useDisplay } from 'vuetify';
 import GenericList from '@/components/generic/GenericList.vue';
 import GenericForm from '@/components/generic/GenericForm.vue';
+import CyberHeader from '@/components/shared/CyberHeader.vue';
+import CyberChip from '@/components/shared/CyberChip.vue';
 import type { Tag, FormSchema } from '@/types/entities';
 import { TagType } from '@/types/entities';
 import { tagService } from '@/services/tagService';

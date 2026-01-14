@@ -1,0 +1,70 @@
+/* Global Cyber Theme Styles */
+
+:root {
+    --accent-orange: #ffbd2e;
+    /* Example fallback, adjust if needed based on vuetify theme */
+    --accent-pink: #ff5f56;
+    --text-dim: #aaa;
+    --code-font: 'Fira Code', monospace;
+}
+
+/* View Logo */
+.view-logo {
+    height: 100px;
+    width: auto;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+}
+
+/* Cyber Title */
+.cyber-title {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 0 !important;
+}
+
+/* Cyber Chip */
+.cyber-chip {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #616161;
+}
+
+/* Blink Animation */
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+.blink-cursor {
+    animation: blink 1s infinite;
+}
+
+/* Utility Utilities */
+.text-dim {
+    color: var(--text-dim);
+}

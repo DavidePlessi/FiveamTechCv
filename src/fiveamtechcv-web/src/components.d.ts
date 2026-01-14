@@ -11,9 +11,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CyberChip: typeof import('./components/shared/CyberChip.vue')['default']
+    CyberHeader: typeof import('./components/shared/CyberHeader.vue')['default']
     GenericForm: typeof import('./components/generic/GenericForm.vue')['default']
     GenericList: typeof import('./components/generic/GenericList.vue')['default']
+    MonitorPanel: typeof import('./components/dashboard/MonitorPanel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StatCard: typeof import('./components/dashboard/StatCard.vue')['default']
   }
 }

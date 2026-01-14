@@ -1,11 +1,6 @@
 ﻿<template>
   <div class="d-flex flex-column h-100">
-    <div class="d-flex justify-space-between align-center mb-4">
-      <div class="d-flex align-center">
-        <img src="@/assets/logo-nobg.png" alt="Logo" class="view-logo mr-4" />
-        <h1 class="cyber-title">GraphQL Playground</h1>
-      </div>
-    </div>
+    <cyber-header title="GraphQL Playground" />
 
     <v-row class="flex-grow-1 ma-0 w-100">
       <v-col cols="12" md="6" class="d-flex flex-column pa-2" style="min-height: 50vh;">
@@ -75,6 +70,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import httpClient from '@/services/httpClient';
+import CyberHeader from '@/components/shared/CyberHeader.vue';
 
 const query = ref(`query {
   projects(order: [{ order: ASC }]) {
@@ -145,18 +141,6 @@ const executeQuery = async () => {
 </script>
 
 <style scoped>
-.view-logo {
-  height: 100px;
-  width: auto;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
-}
-
-.cyber-title {
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  letter-spacing: 2px;
-  margin-bottom: 0 !important;
-}
 .code-editor :deep(.v-field__input) {
   font-family: 'Fira Code', monospace;
   font-size: 14px;
@@ -184,24 +168,5 @@ const executeQuery = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-}
-
-/* Custom Scrollbar for dark theme */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #1e1e1e;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #424242;
-  border-radius: 5px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #616161;
 }
 </style>
