@@ -14,9 +14,11 @@
 > **Note:** This project is currently under active development and is **not ready for production**.
 
 ### 🚀 Upcoming Features
-- [ ] **Work Experience**: Advanced tracking and visualization of career history.
+- [x] **Work Experience**: Tracking and visualization of career history.
+- [x] **Comapnies**: Create and handle companies linked to work experience.
+- [x] **People**: Personal profile management linked to work experience and projects.
+- [ ] **User Permissions**: Implement user permission on companies and people
 - [ ] **Studies**: Comprehensive education mapping.
-- [ ] **Person**: Detailed personal profile management and multi-person management.
 - [ ] **AI Integration**: AI-powered data interaction and analysis.
 
 ---
