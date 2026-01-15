@@ -7,6 +7,7 @@ namespace FiveamTechCv.Entities.Nodes;
 public class WorkExperience : BaseNode
 {
     public string? Company { get; set; }
+    public string? CompanyUrl { get; set; }
     public string? Position { get; set; }
     
     [ParameterType(ParameterTypes.ZoneDateTime)]

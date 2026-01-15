@@ -12,7 +12,17 @@
       :headers="headers"
       :loading="loading"
       :filter-schema="filterSchema"
+      @detail="openDetail"
+      @edit="openDialog"
+      @delete="deleteItem"
     >
+      <template #item.company="{ item }">
+        <a v-if="item.companyUrl" :href="item.companyUrl" target="_blank" class="text-decoration-none text-high-emphasis font-weight-bold">
+            {{ item.company }} <v-icon size="small" icon="mdi-open-in-new" color="primary"></v-icon>
+        </a>
+        <span v-else>{{ item.company }}</span>
+      </template>
+
       <template #item.dates="{ item }">
         {{ formatDate(item.startDate) }} - {{ item.endDate ? formatDate(item.endDate) : 'Present' }}
       </template>
@@ -36,11 +46,13 @@
       </template>
 
       <template #item.actions="{ item }">
+        <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="openDetail(item)"></v-btn>
         <v-btn v-if="authStore.isAuthenticated" icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
         <v-btn v-if="authStore.isAuthenticated" icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
       </template>
     </generic-list>
 
+    <!-- Edit Dialog -->
     <v-dialog v-model="dialog" max-width="800px" :fullscreen="mobile" :transition="mobile ? 'dialog-bottom-transition' : 'dialog-transition'">
       <v-card>
         <v-toolbar v-if="mobile" color="primary" density="compact">
@@ -63,6 +75,25 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <!-- Detail Dialog -->
+    <v-dialog v-model="detailDialog" max-width="800px" :fullscreen="mobile" :transition="mobile ? 'dialog-bottom-transition' : 'dialog-transition'">
+      <v-card>
+        <v-toolbar v-if="mobile" color="primary" density="compact">
+            <v-btn icon="mdi-close" @click="closeDetail"></v-btn>
+            <v-toolbar-title>Experience Details</v-toolbar-title>
+        </v-toolbar>
+        <v-card-title v-else>Experience Details</v-card-title>
+        <v-card-text>
+           <generic-detail
+             v-if="detailDialog"
+             :model-value="detailItem"
+             :schema="schema"
+             @close="closeDetail"
+           />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -71,6 +102,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import GenericList from '@/components/generic/GenericList.vue';
 import GenericForm from '@/components/generic/GenericForm.vue';
+import GenericDetail from '@/components/generic/GenericDetail.vue';
 import CyberHeader from '@/components/shared/CyberHeader.vue';
 import CyberChip from '@/components/shared/CyberChip.vue';
 import type { WorkExperience, FormSchema } from '@/types/entities';
@@ -84,7 +116,9 @@ const authStore = useAuthStore();
 const items = ref<WorkExperience[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
+const detailDialog = ref(false);
 const editedItem = ref<WorkExperience>({});
+const detailItem = ref<WorkExperience>({});
 const allProjects = ref<any[]>([]);
 const allTags = ref<any[]>([]);
 
@@ -96,16 +130,15 @@ const headers = computed(() => {
     { title: 'Dates', key: 'dates' },
     // { title: 'Projects', key: 'projects' },
     { title: 'Tags', key: 'tags' },
+    { title: 'Actions', key: 'actions' }
   ];
-  if (authStore.isAuthenticated) {
-    baseHeaders.push({ title: 'Actions', key: 'actions' });
-  }
   return baseHeaders;
 });
 
 const schema = ref<FormSchema>({
   fields: [
     { key: 'company', label: 'Company', type: 'text', required: true },
+    { key: 'companyUrl', label: 'Company URL', type: 'text' },
     { key: 'position', label: 'Position', type: 'text', required: true },
     { key: 'startDate', label: 'Start Date', type: 'date', required: true },
     { key: 'endDate', label: 'End Date', type: 'date' },
@@ -192,7 +225,7 @@ const loadData = async () => {
                 });
             }
         });
-        
+
         filterTagField.options = allTags.value.filter(t => usedTagIds.has(t.value));
     }
 
@@ -226,6 +259,21 @@ const openDialog = (item?: WorkExperience) => {
 
 const closeDialog = () => {
   dialog.value = false;
+};
+
+const openDetail = (item: WorkExperience) => {
+    detailItem.value = JSON.parse(JSON.stringify(item));
+    if (item.projects) {
+        detailItem.value.projectIdsToLink = item.projects.map(p => p.id!);
+    }
+    if (item.tags) {
+        detailItem.value.tagIdsToLink = item.tags.map(t => t.id!);
+    }
+    detailDialog.value = true;
+};
+
+const closeDetail = () => {
+    detailDialog.value = false;
 };
 
 const save = async (item: WorkExperience) => {

@@ -1,11 +1,11 @@
 <template>
-  <v-form ref="form" v-model="valid" @submit.prevent="submit" class="cyber-form">
+  <v-form ref="form" v-model="valid" @submit.prevent="submit" class="cyber-form  pb-16">
     <v-row>
       <v-col
         v-for="field in schema.fields"
         :key="field.key"
         cols="12"
-        :md="field.type === 'object-array' ? 12 : 6"
+        :md="field.type === 'object-array' || (['select', 'autocomplete'].includes(field.type) && field.multiple) ? 12 : 6"
       >
         <!-- Text Input -->
         <v-text-field
@@ -82,8 +82,8 @@
         ></cyber-datepicker>
 
         <!-- Object Array (e.g. LocalizedString) -->
-        <div v-if="field.type === 'object-array'" class="cyber-group-container pa-4 rounded">
-          <div class="d-flex justify-space-between align-center mb-4">
+        <div v-if="field.type === 'object-array'" class="cyber-group-container pa-2 rounded">
+          <div class="d-flex justify-space-between align-center mb-4 pl-4 pr-4">
             <h3 class="cyber-group-title">{{ field.label }}</h3>
             <v-btn size="small" color="primary" variant="outlined" class="cyber-btn" @click="addItem(field.key, field.itemSchema)">
               <v-icon start>mdi-plus</v-icon> Add Item
@@ -94,14 +94,13 @@
             <div
               v-for="(item, index) in modelValue[field.key]"
               :key="index"
-              class="cyber-group-item d-flex align-start gap-2 mb-3 pa-3"
+              class="cyber-group-item d-flex  align-start gap-2 mb-3 "
             >
-              <v-row dense class="flex-grow-1">
+              <v-col dense class="flex-grow-1 pa-0">
                 <v-col
                   v-for="subField in field.itemSchema.fields"
                   :key="subField.key"
                   cols="12"
-                  md="6"
                 >
                   <v-text-field
                     v-if="subField.type === 'text'"
@@ -132,7 +131,7 @@
                     density="compact"
                     variant="outlined"
                     hide-details="auto"
-                    rows="3"
+                    rows="5"
                     class="cyber-input"
                   ></v-textarea>
                    <v-select
@@ -147,15 +146,17 @@
                     class="cyber-input"
                   ></v-select>
                 </v-col>
-              </v-row>
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                color="error"
-                variant="text"
-                class="mt-1"
-                @click="removeItem(field.key, index)"
-              ></v-btn>
+                <v-col class="d-flex justify-end">
+                  <v-btn
+                    icon="mdi-delete"
+                    size="small"
+                    color="error"
+                    variant="text"
+                    class="mt-1"
+                    @click="removeItem(field.key, index)"
+                  ></v-btn>
+                </v-col>
+              </v-col>
             </div>
           </div>
         </div>

@@ -17,6 +17,35 @@
       <template v-for="(_, name) in $slots" v-slot:[name]="slotData">
         <slot :name="name" v-bind="slotData" />
       </template>
+
+      <!-- Default Actions Slot if not overridden -->
+      <template v-if="!$slots['item.actions']" v-slot:item.actions="{ item }">
+         <div class="d-flex justify-end">
+            <v-btn
+              icon="mdi-eye"
+              variant="text"
+              size="small"
+              color="info"
+              class="mr-2"
+              @click="$emit('detail', item)"
+            ></v-btn>
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              size="small"
+              color="primary"
+              class="mr-2"
+              @click="$emit('edit', item)"
+            ></v-btn>
+            <v-btn
+              icon="mdi-delete"
+              variant="text"
+              size="small"
+              color="error"
+              @click="$emit('delete', item)"
+            ></v-btn>
+         </div>
+      </template>
     </v-data-table>
 
     <!-- Mobile View -->
@@ -45,7 +74,31 @@
               </div>
             </div>
             <div class="card-actions mt-3 d-flex justify-end">
-              <slot name="item.actions" :item="item"></slot>
+              <slot name="item.actions" :item="item">
+                 <v-btn
+                    icon="mdi-eye"
+                    variant="text"
+                    size="small"
+                    color="info"
+                    class="mr-2"
+                    @click="$emit('detail', item)"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-pencil"
+                    variant="text"
+                    size="small"
+                    color="primary"
+                    class="mr-2"
+                    @click="$emit('edit', item)"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-delete"
+                    variant="text"
+                    size="small"
+                    color="error"
+                    @click="$emit('delete', item)"
+                  ></v-btn>
+              </slot>
             </div>
 
             <!-- Deco Corners -->
@@ -176,6 +229,8 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
 });
 
+const emit = defineEmits(['detail', 'edit', 'delete']);
+
 const { mobile } = useDisplay();
 
 const activeFilters = ref<any[]>([]);
@@ -205,7 +260,7 @@ const filteredItems = computed(() => {
           return Object.keys(filtersByKey).every(key => {
               const groupFilters = filtersByKey[key] || [];
               const itemValue = item[key]; // This might be an array for some properties? Assuming scalar for now based on current usage.
-              
+
               // If item doesn't have the property, it fails the filter (unless we want to support "not set")
               if (itemValue === undefined || itemValue === null) return false;
 
@@ -215,7 +270,7 @@ const filteredItems = computed(() => {
                   if (typeof itemValue === 'string' && typeof filter.value === 'string') {
                       return itemValue.toLowerCase().includes(filter.value.toLowerCase());
                   }
-                  
+
                   // Number comparison (exact)
                   if (typeof itemValue === 'number' && (typeof filter.value === 'number' || !isNaN(Number(filter.value)))) {
                       return itemValue === Number(filter.value);
@@ -232,7 +287,7 @@ const filteredItems = computed(() => {
                                // Check ID match (common for Select filters)
                                if (child.id === filter.value) return true;
                                // Check Name match (common for Text filters)
-                               if (child.name && typeof filter.value === 'string' && 
+                               if (child.name && typeof filter.value === 'string' &&
                                    child.name.toLowerCase().includes(filter.value.toLowerCase())) return true;
                            }
                            return false;

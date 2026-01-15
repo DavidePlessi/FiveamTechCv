@@ -14,6 +14,7 @@ declare module 'vue' {
     CyberChip: typeof import('./components/shared/CyberChip.vue')['default']
     CyberDatepicker: typeof import('./components/shared/CyberDatepicker.vue')['default']
     CyberHeader: typeof import('./components/shared/CyberHeader.vue')['default']
+    GenericDetail: typeof import('./components/generic/GenericDetail.vue')['default']
     GenericFilter: typeof import('./components/generic/GenericFilter.vue')['default']
     GenericForm: typeof import('./components/generic/GenericForm.vue')['default']
     GenericList: typeof import('./components/generic/GenericList.vue')['default']

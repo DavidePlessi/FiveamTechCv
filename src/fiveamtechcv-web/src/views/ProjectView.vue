@@ -12,6 +12,9 @@
       :headers="headers"
       :loading="loading"
       :filter-schema="filterSchema"
+      @detail="openDetail"
+      @edit="openDialog"
+      @delete="deleteItem"
     >
       <template #item.description="{ item }">
         <div v-for="desc in item.description" :key="desc.language">
@@ -28,11 +31,13 @@
       </template>
 
       <template #item.actions="{ item }">
+        <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="openDetail(item)"></v-btn>
         <v-btn v-if="authStore.isAuthenticated" icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
         <v-btn v-if="authStore.isAuthenticated" icon="mdi-delete" size="small" variant="text" color="error" @click="deleteItem(item)"></v-btn>
       </template>
     </generic-list>
 
+    <!-- Edit Dialog -->
     <v-dialog v-model="dialog" max-width="800px" :fullscreen="mobile" :transition="mobile ? 'dialog-bottom-transition' : 'dialog-transition'">
       <v-card>
         <v-toolbar v-if="mobile" color="primary" density="compact">
@@ -55,6 +60,25 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <!-- Detail Dialog -->
+    <v-dialog v-model="detailDialog" max-width="800px" :fullscreen="mobile" :transition="mobile ? 'dialog-bottom-transition' : 'dialog-transition'">
+      <v-card>
+        <v-toolbar v-if="mobile" color="primary" density="compact">
+            <v-btn icon="mdi-close" @click="closeDetail"></v-btn>
+            <v-toolbar-title>Project Details</v-toolbar-title>
+        </v-toolbar>
+        <v-card-title v-else>Project Details</v-card-title>
+        <v-card-text>
+           <generic-detail
+             v-if="detailDialog"
+             :model-value="detailItem"
+             :schema="projectSchema"
+             @close="closeDetail"
+           />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -67,6 +91,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import GenericList from '@/components/generic/GenericList.vue';
 import GenericForm from '@/components/generic/GenericForm.vue';
+import GenericDetail from '@/components/generic/GenericDetail.vue';
 import CyberHeader from '@/components/shared/CyberHeader.vue';
 import CyberChip from '@/components/shared/CyberChip.vue';
 import type { Project, FormSchema } from '@/types/entities';
@@ -79,7 +104,9 @@ const authStore = useAuthStore();
 const projects = ref<Project[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
+const detailDialog = ref(false);
 const editedItem = ref<Project>({ name: '', description: [], tagIdsToLink: [] });
+const detailItem = ref<Project>({ name: '', description: [], tagIdsToLink: [] });
 const tags = ref<any[]>([]);
 
 const headers = computed(() => {
@@ -88,10 +115,8 @@ const headers = computed(() => {
     { title: 'Order', key: 'order' },
     { title: 'Description', key: 'description' },
     { title: 'Tags', key: 'tags' },
+    { title: 'Actions', key: 'actions' }
   ];
-  if (authStore.isAuthenticated) {
-    baseHeaders.push({ title: 'Actions', key: 'actions' });
-  }
   return baseHeaders;
 });
 
@@ -132,42 +157,6 @@ const filterSchema = ref<FormSchema>({
     { key: 'tags', label: 'Tag', type: 'select', options: [] }, // Options populated in loadData
   ]
 });
-
-const loadData = async () => {
-  loading.value = true;
-  try {
-    const [fetchedProjects, fetchedTags] = await Promise.all([
-      projectService.getAll(),
-      projectService.getAll()
-    ]);
-    projects.value = fetchedProjects;
-    // Note: fetchedTags might be incorrect if duplicate service call, fixing below
-    // Re-reading logic from original file:
-    // const [fetchedProjects, fetchedTags] = await Promise.all([
-    //   projectService.getAll(),
-    //   tagService.getAll()
-    // ]);
-    const actualTags = await tagService.getAll();
-    tags.value = actualTags.map(t => ({ text: t.name, value: t.id }));
-
-    const tagField = projectSchema.value.fields.find(f => f.key === 'tagIdsToLink');
-    if (tagField) {
-        tagField.options = tags.value;
-    }
-  } catch (e) {
-    console.error('Error loading data', e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// Fix the typo in loadData above in the actual implementation call, I will do it correctly here
-// Actually I should be careful not to introduce bugs.
-// Original:
-// const [fetchedProjects, fetchedTags] = await Promise.all([
-//   projectService.getAll(),
-//   tagService.getAll()
-// ]);
 
 onMounted(async () => {
     loading.value = true;
@@ -222,6 +211,18 @@ const openDialog = (item?: Project) => {
 
 const closeDialog = () => {
   dialog.value = false;
+};
+
+const openDetail = (item: Project) => {
+    detailItem.value = JSON.parse(JSON.stringify(item));
+    if (item.tags) {
+        detailItem.value.tagIdsToLink = item.tags.map(t => t.id!);
+    }
+    detailDialog.value = true;
+};
+
+const closeDetail = () => {
+    detailDialog.value = false;
 };
 
 const save = async (item: Project) => {

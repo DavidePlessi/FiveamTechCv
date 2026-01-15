@@ -6,6 +6,7 @@ namespace FiveamTechCv.Entities.DTO;
 public class WorkExperienceDto : BaseDto<WorkExperience>
 {
     public string? Company { get; set; }
+    public string? CompanyUrl { get; set; }
     public string? Position { get; set; }
     
     public List<LocalizedStringDto>? Description { get; set; }

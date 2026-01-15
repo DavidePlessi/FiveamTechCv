@@ -37,6 +37,7 @@ export interface Project extends BaseEntity {
 
 export interface WorkExperience extends BaseEntity {
     company?: string;
+    companyUrl?: string;
     position?: string;
     description?: LocalizedString[];
     startDate?: string;

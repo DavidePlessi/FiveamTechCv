@@ -1,10 +1,10 @@
 <template>
   <v-app>
-    <!-- Background Effects -->
-    <div id="sky-gradient"></div>
-    <div class="grid-overlay"></div>
+<!--    &lt;!&ndash; Background Effects &ndash;&gt;-->
+<!--    <div id="sky-gradient"></div>-->
+<!--    <div class="grid-overlay"></div>-->
 
-    <v-main>
+    <v-main class="pb-16">
       <router-view />
     </v-main>
 
