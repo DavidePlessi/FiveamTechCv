@@ -24,4 +24,7 @@ public class Project : BaseNode
     //To Description
     public const string HAS_DESCRIPTION = "HAS_DESCRIPTION";
     
+    [Neo4JRelationship(Person.HAS_PROJECT, RelationshipDirection.Incoming)]
+    [ParameterType(ParameterTypes.Ignore)]
+    public List<Person>? People { get; set; }
 }

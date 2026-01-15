@@ -14,6 +14,14 @@
         <v-icon>mdi-home</v-icon>
         <span class="dock-tooltip">Dashboard</span>
       </router-link>
+      <router-link to="/companies" class="dock-item" :class="{ active: $route.path === '/companies' }">
+        <v-icon>mdi-domain</v-icon>
+        <span class="dock-tooltip">Companies</span>
+      </router-link>
+      <router-link to="/people" class="dock-item" :class="{ active: $route.path === '/people' }">
+        <v-icon>mdi-account</v-icon>
+        <span class="dock-tooltip">People</span>
+      </router-link>
       <router-link to="/work-experiences" class="dock-item" :class="{ active: $route.path === '/work-experiences' }">
         <v-icon>mdi-briefcase</v-icon>
         <span class="dock-tooltip">Work Experiences</span>
@@ -36,7 +44,7 @@
          <span class="dock-tooltip">Logout</span>
       </a>
       <router-link v-else to="/login" class="dock-item" :class="{ active: $route.path === '/login' }">
-         <v-icon>mdi-account</v-icon>
+         <v-icon>mdi-login</v-icon>
          <span class="dock-tooltip">Login</span>
       </router-link>
     </nav>

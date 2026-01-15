@@ -94,6 +94,16 @@ public static class Extensions
         foreach (var typeProperty in typeProperties)
         {
             var parameterTypeAttribute = typeProperty?.GetCustomAttribute<ParameterTypeAttribute>();
+            
+            // Check for Ignore
+            if (parameterTypeAttribute?.Type == ParameterTypes.Ignore)
+                continue;
+
+            // Check for Relationship - related nodes are not populated in this simple conversion
+            var relationshipAttr = typeProperty?.GetCustomAttribute<Neo4JRelationshipAttribute>();
+            if (relationshipAttr != null)
+                continue;
+
             var propName = parameterTypeAttribute?.PropertyName ?? typeProperty?.Name;
             var value = properties.GetValueOrDefault(propName);
             

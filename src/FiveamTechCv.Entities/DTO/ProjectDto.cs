@@ -12,4 +12,7 @@ public class ProjectDto : BaseDto<Project>
     
     [EntityConversionInfo(false, "Tags")]
     public List<string>? TagIdsToLink { get; set; }
+    
+    [EntityConversionInfo(false, "People")]
+    public List<string>? PersonIdsToLink { get; set; }
 }

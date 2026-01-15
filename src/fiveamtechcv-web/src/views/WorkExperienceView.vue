@@ -17,10 +17,10 @@
       @delete="deleteItem"
     >
       <template #item.company="{ item }">
-        <a v-if="item.companyUrl" :href="item.companyUrl" target="_blank" class="text-decoration-none text-high-emphasis font-weight-bold">
-            {{ item.company }} <v-icon size="small" icon="mdi-open-in-new" color="primary"></v-icon>
+        <a v-if="item.company && item.company.website" :href="item.company.website" target="_blank" class="text-decoration-none text-high-emphasis font-weight-bold">
+            {{ item.company.name }} <v-icon size="small" icon="mdi-open-in-new" color="primary"></v-icon>
         </a>
-        <span v-else>{{ item.company }}</span>
+        <span v-else-if="item.company">{{ item.company.name }}</span>
       </template>
 
       <template #item.dates="{ item }">
@@ -42,6 +42,15 @@
             :key="tag.id"
             :text="tag.name"
             icon="mdi-tag-outline"
+        />
+      </template>
+
+      <template #item.person="{ item }">
+        <cyber-chip
+            v-if="item.person"
+            :text="`${item.person.name} ${item.person.lastName}`"
+            icon="mdi-account"
+            color="info"
         />
       </template>
 
@@ -109,7 +118,10 @@ import type { WorkExperience, FormSchema } from '@/types/entities';
 import { workExperienceService } from '@/services/workExperienceService';
 import { projectService } from '@/services/projectService';
 import { tagService } from '@/services/tagService';
+import { personService } from '@/services/personService';
+import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
+import { formatDate } from '@/utils/date';
 
 const { mobile } = useDisplay();
 const authStore = useAuthStore();
@@ -121,11 +133,13 @@ const editedItem = ref<WorkExperience>({});
 const detailItem = ref<WorkExperience>({});
 const allProjects = ref<any[]>([]);
 const allTags = ref<any[]>([]);
+const allPeople = ref<any[]>([]);
+const allCompanies = ref<any[]>([]);
 
 const headers = computed(() => {
   const baseHeaders = [
-    { title: 'Order', key: 'order' },
     { title: 'Company', key: 'company' },
+    { title: 'Person', key: 'person' },
     { title: 'Position', key: 'position' },
     { title: 'Dates', key: 'dates' },
     // { title: 'Projects', key: 'projects' },
@@ -137,8 +151,14 @@ const headers = computed(() => {
 
 const schema = ref<FormSchema>({
   fields: [
-    { key: 'company', label: 'Company', type: 'text', required: true },
-    { key: 'companyUrl', label: 'Company URL', type: 'text' },
+    {
+      key: 'companyIdToLink',
+      label: 'Company',
+      type: 'autocomplete',
+      multiple: false,
+      options: [],
+      required: true
+    },
     { key: 'position', label: 'Position', type: 'text', required: true },
     { key: 'startDate', label: 'Start Date', type: 'date', required: true },
     { key: 'endDate', label: 'End Date', type: 'date' },
@@ -173,6 +193,13 @@ const schema = ref<FormSchema>({
       multiple: true,
       options: []
     },
+    {
+      key: 'personIdToLink',
+      label: 'Related Person',
+      type: 'autocomplete',
+      multiple: false,
+      options: []
+    },
     { key: 'order', label: 'Order', type: 'number' },
   ]
 });
@@ -181,38 +208,43 @@ const filterSchema = ref<FormSchema>({
   fields: [
     { key: 'company', label: 'Company', type: 'text' },
     { key: 'position', label: 'Position', type: 'text' },
-    { key: 'tags', label: 'Tag', type: 'select', options: [] }
+    { key: 'tags', label: 'Tag', type: 'select', options: [] },
+    { key: 'people', label: 'Person', type: 'select', options: [] },
   ]
 });
 
-const formatDate = (dateValue?: string) => {
-    if (!dateValue) return '';
-    // Use ISO string slice to get YYYY-MM-DD.
-    // Assuming backend sends correct ISO format which parses correctly.
-    try {
-        return new Date(dateValue).toISOString().slice(0, 10);
-    } catch (e) {
-        return dateValue;
-    }
-};
+
 
 const loadData = async () => {
   loading.value = true;
   try {
-    const [fetchedItems, fetchedProjects, fetchedTags] = await Promise.all([
+    const [fetchedItems, fetchedProjects, fetchedTags, fetchedPeople, fetchedCompanies] = await Promise.all([
       workExperienceService.getAll(),
       projectService.getAll(),
-      tagService.getAll()
+      tagService.getAll(),
+      personService.getAll(),
+      companyService.getAll()
     ]);
-    items.value = fetchedItems;
+    items.value = fetchedItems.map(item => ({
+        ...item,
+        title: `${item.position} at ${item.company?.name || 'Unknown'}`
+    }));
     allProjects.value = fetchedProjects.map(p => ({ text: p.name, value: p.id }));
     allTags.value = fetchedTags.map(t => ({ text: t.name, value: t.id }));
+    allPeople.value = fetchedPeople.map(p => ({ text: `${p.name} ${p.lastName}`, value: p.id }));
+    allCompanies.value = fetchedCompanies.map(c => ({ text: c.name, value: c.id }));
+
+    const companyField = schema.value.fields.find(f => f.key === 'companyIdToLink');
+    if (companyField) companyField.options = allCompanies.value;
 
     const projectField = schema.value.fields.find(f => f.key === 'projectIdsToLink');
     if (projectField) projectField.options = allProjects.value;
 
     const tagField = schema.value.fields.find(f => f.key === 'tagIdsToLink');
     if (tagField) tagField.options = allTags.value;
+
+    const personField = schema.value.fields.find(f => f.key === 'personIdToLink');
+    if (personField) personField.options = allPeople.value;
 
     const filterTagField = filterSchema.value.fields.find(f => f.key === 'tags');
     if (filterTagField) {
@@ -227,6 +259,17 @@ const loadData = async () => {
         });
 
         filterTagField.options = allTags.value.filter(t => usedTagIds.has(t.value));
+    }
+
+    const filterPersonField = filterSchema.value.fields.find(f => f.key === 'people');
+    if (filterPersonField) {
+         const usedPersonIds = new Set<string>();
+         items.value.forEach(item => {
+             if (item.person && item.person.id) {
+                 usedPersonIds.add(item.person.id);
+             }
+         });
+         filterPersonField.options = allPeople.value.filter(p => usedPersonIds.has(p.value));
     }
 
   } catch (e) {
@@ -248,6 +291,12 @@ const openDialog = (item?: WorkExperience) => {
     if (item.tags) {
         editedItem.value.tagIdsToLink = item.tags.map(t => t.id!);
     }
+    if (item.person) {
+        editedItem.value.personIdToLink = item.person.id;
+    }
+    if (item.company) {
+        editedItem.value.companyIdToLink = item.company.id;
+    }
     if (!editedItem.value.description) {
         editedItem.value.description = [];
     }
@@ -268,6 +317,12 @@ const openDetail = (item: WorkExperience) => {
     }
     if (item.tags) {
         detailItem.value.tagIdsToLink = item.tags.map(t => t.id!);
+    }
+    if (item.person) {
+        detailItem.value.personIdToLink = item.person.id; // Or setup display property if detail view uses schema to resolve ID to Text
+    }
+    if (item.company) {
+        detailItem.value.companyIdToLink = item.company.id;
     }
     detailDialog.value = true;
 };

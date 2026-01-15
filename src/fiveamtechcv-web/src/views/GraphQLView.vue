@@ -34,6 +34,8 @@
           <v-card-title class="d-flex align-center justify-space-between py-2 px-4 bg-surface-variant">
             <span class="text-caption font-weight-bold text-uppercase">Query</span>
             <div class="d-flex ga-2">
+               <v-btn size="x-small" variant="tonal" @click="setExample('companies')">Companies</v-btn>
+               <v-btn size="x-small" variant="tonal" @click="setExample('people')">People</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('workExperiences')">Work Exp</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('projects')">Projects</v-btn>
                <v-btn size="x-small" variant="tonal" @click="setExample('tags')">Tags</v-btn>
@@ -118,8 +120,26 @@ const loading = ref(false);
 const isError = ref(false);
 
 const documentation = {
+  Company: {
+    name: "String - Name of the company",
+    website: "String - Website of the company",
+    description: "[LocalizedString] - Localized company descriptions"
+  },
+  Person: {
+    name: "String - First name",
+    lastName: "String - Last name",
+    bornDate: "DateTime - Date of birth",
+    info: "[LocalizedString] - General information",
+    summary: "[LocalizedString] - Summary",
+    mindset: "[LocalizedString] - Mindset description",
+    slogan: "[LocalizedString] - Personal slogan",
+    projects: "[Project] - Related projects",
+    workExperiences: "[WorkExperience] - Related work experiences",
+    tags: "[Tag] - Related tags"
+  },
   WorkExperience: {
-    company: "String - Name of the company",
+    companies: "Company - The company",
+    people: "Person - The person",
     position: "String - Job title/position",
     startDate: "DateTime - Start date of employment",
     endDate: "DateTime - End date of employment (null if current)",
@@ -132,7 +152,8 @@ const documentation = {
     name: "String - Name of the project",
     order: "Int - Display order",
     description: "[LocalizedString] - Localized project descriptions",
-    tags: "[Tag] - General tag associated"
+    tags: "[Tag] - General tag associated",
+    people: "[Person] - People associated"
   },
   Tag: {
     name: "String - Name of the technology/skill",
@@ -163,7 +184,10 @@ const examples: Record<string, string> = {
 }`,
   workExperiences: `query {
   workExperiences(order: [{ order: ASC }]) {
-    company
+    companies {
+      name
+      website
+    }
     position
     startDate
     endDate
@@ -184,6 +208,16 @@ const examples: Record<string, string> = {
     }
   }
 }`,
+  companies: `query {
+  companies(order: [{ name: ASC }]) {
+    name
+    website
+    description {
+      language
+      value
+    }
+  }
+}`,
   tags: `query {
   tags(order: [{ name: ASC }]) {
     name
@@ -194,6 +228,42 @@ const examples: Record<string, string> = {
         language
         value
       }
+    }
+  }
+}`,
+  people: `query {
+  people(order: [{ lastName: ASC }]) {
+    name
+    lastName
+    bornDate
+    info {
+      language
+      value
+    }
+    summary {
+      language
+      value
+    }
+    mindset {
+      language
+      value
+    }
+    slogan {
+      language
+      value
+    }
+    projects {
+      name
+    }
+    workExperiences {
+      companies {
+        name
+      }
+      position
+    }
+    tags {
+      name
+      type
     }
   }
 }`

@@ -21,6 +21,21 @@ public class BaseDto<T>
             
             var value = prop.GetValue(this);
             
+            // Handle single string (Id) to BaseNode conversion
+            if (value is string idStr && typeof(BaseNode).IsAssignableFrom(entityProp.PropertyType))
+            {
+                 if (!string.IsNullOrEmpty(idStr))
+                 {
+                     var node = Activator.CreateInstance(entityProp.PropertyType) as BaseNode;
+                     if (node != null)
+                     {
+                         node.Id = idStr;
+                         entityProp.SetValue(entity, node);
+                     }
+                 }
+                 continue;
+            }
+            
             // Handle list of BaseDto conversion to list of BaseNode
             if (value != null && 
                 value.GetType().IsGenericType && 

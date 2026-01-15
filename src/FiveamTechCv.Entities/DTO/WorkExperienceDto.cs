@@ -5,8 +5,6 @@ namespace FiveamTechCv.Entities.DTO;
 
 public class WorkExperienceDto : BaseDto<WorkExperience>
 {
-    public string? Company { get; set; }
-    public string? CompanyUrl { get; set; }
     public string? Position { get; set; }
     
     public List<LocalizedStringDto>? Description { get; set; }
@@ -20,4 +18,10 @@ public class WorkExperienceDto : BaseDto<WorkExperience>
     
     [EntityConversionInfo(false, "Tags")]
     public List<string>? TagIdsToLink { get; set; }
+    
+    [EntityConversionInfo(false, "People")]
+    public List<string>? PersonIdToLink { get; set; }
+    
+    [EntityConversionInfo(false, "Companies")]
+    public List<string>? CompanyIdToLink { get; set; }
 }

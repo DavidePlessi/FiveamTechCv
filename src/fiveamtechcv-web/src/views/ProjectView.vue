@@ -30,6 +30,16 @@
         />
       </template>
 
+      <template #item.people="{ item }">
+        <cyber-chip
+            v-for="person in item.people"
+            :key="person.id"
+            :text="`${person.name} ${person.lastName}`"
+            icon="mdi-account"
+            color="info"
+        />
+      </template>
+
       <template #item.actions="{ item }">
         <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="openDetail(item)"></v-btn>
         <v-btn v-if="authStore.isAuthenticated" icon="mdi-pencil" size="small" variant="text" color="primary" @click="openDialog(item)"></v-btn>
@@ -97,6 +107,7 @@ import CyberChip from '@/components/shared/CyberChip.vue';
 import type { Project, FormSchema } from '@/types/entities';
 import { projectService } from '@/services/projectService';
 import { tagService } from '@/services/tagService';
+import { personService } from '@/services/personService';
 import { useAuthStore } from '@/stores/auth';
 
 const { mobile } = useDisplay();
@@ -105,9 +116,10 @@ const projects = ref<Project[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
 const detailDialog = ref(false);
-const editedItem = ref<Project>({ name: '', description: [], tagIdsToLink: [] });
-const detailItem = ref<Project>({ name: '', description: [], tagIdsToLink: [] });
+const editedItem = ref<Project>({ name: '', description: [], tagIdsToLink: [], personIdsToLink: [] });
+const detailItem = ref<Project>({ name: '', description: [], tagIdsToLink: [], personIdsToLink: [] });
 const tags = ref<any[]>([]);
+const people = ref<any[]>([]);
 
 const headers = computed(() => {
   const baseHeaders = [
@@ -115,6 +127,7 @@ const headers = computed(() => {
     { title: 'Order', key: 'order' },
     { title: 'Description', key: 'description' },
     { title: 'Tags', key: 'tags' },
+    { title: 'People', key: 'people' },
     { title: 'Actions', key: 'actions' }
   ];
   return baseHeaders;
@@ -147,6 +160,13 @@ const projectSchema = ref<FormSchema>({
       type: 'autocomplete',
       multiple: true,
       options: []
+    },
+    {
+      key: 'personIdsToLink',
+      label: 'People',
+      type: 'autocomplete',
+      multiple: true,
+      options: []
     }
   ]
 });
@@ -155,22 +175,30 @@ const filterSchema = ref<FormSchema>({
   fields: [
     { key: 'name', label: 'Name', type: 'text' },
     { key: 'tags', label: 'Tag', type: 'select', options: [] }, // Options populated in loadData
+    { key: 'people', label: 'Person', type: 'select', options: [] },
   ]
 });
 
 onMounted(async () => {
     loading.value = true;
     try {
-        const [fetchedProjects, fetchedTags] = await Promise.all([
+        const [fetchedProjects, fetchedTags, fetchedPeople] = await Promise.all([
             projectService.getAll(),
-            tagService.getAll()
+            tagService.getAll(),
+            personService.getAll()
         ]);
         projects.value = fetchedProjects;
         tags.value = fetchedTags.map(t => ({ text: t.name, value: t.id }));
+        people.value = fetchedPeople.map(p => ({ text: `${p.name} ${p.lastName}`, value: p.id}));
 
         const tagField = projectSchema.value.fields.find(f => f.key === 'tagIdsToLink');
         if (tagField) {
             tagField.options = tags.value;
+        }
+
+        const personField = projectSchema.value.fields.find(f => f.key === 'personIdsToLink');
+        if (personField) {
+            personField.options = people.value;
         }
 
         // Populate Filter Options
@@ -186,6 +214,19 @@ onMounted(async () => {
                 }
             });
             filterTagField.options = tags.value.filter(t => usedTagIds.has(t.value));
+        }
+
+        const filterPersonField = filterSchema.value.fields.find(f => f.key === 'people');
+        if (filterPersonField) {
+             const usedPersonIds = new Set<string>();
+             projects.value.forEach(p => {
+                 if (p.people) {
+                     p.people.forEach(per => {
+                         if (per.id) usedPersonIds.add(per.id);
+                     });
+                 }
+             });
+             filterPersonField.options = people.value.filter(p => usedPersonIds.has(p.value));
         }
     } catch (e) {
         console.error('Error loading data', e);
@@ -203,8 +244,12 @@ const openDialog = (item?: Project) => {
         // Ensure description is initialized array if null
         if (!editedItem.value.description) editedItem.value.description = [];
     }
+    if (item.people) {
+        editedItem.value.personIdsToLink = item.people.map(p => p.id!);
+        if(!editedItem.value.description) editedItem.value.description = [];
+    }
   } else {
-    editedItem.value = { name: '', description: [], tagIdsToLink: [] };
+    editedItem.value = { name: '', description: [], tagIdsToLink: [], personIdsToLink: [] };
   }
   dialog.value = true;
 };
@@ -217,6 +262,9 @@ const openDetail = (item: Project) => {
     detailItem.value = JSON.parse(JSON.stringify(item));
     if (item.tags) {
         detailItem.value.tagIdsToLink = item.tags.map(t => t.id!);
+    }
+    if (item.people) {
+        detailItem.value.personIdsToLink = item.people.map(p => p.id!);
     }
     detailDialog.value = true;
 };

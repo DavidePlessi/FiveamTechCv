@@ -197,6 +197,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue';
 import type { FormSchema, FormField } from '@/types/entities';
+import { formatDate } from '@/utils/date';
 
 interface Props {
   modelValue: any;
@@ -246,10 +247,6 @@ const getOptionLabel = (field: FormField, value: any) => {
     return option ? option.text : value;
 };
 
-const formatDate = (value: string) => {
-    if (!value) return '-';
-    return new Date(value).toLocaleDateString();
-};
 
 const getDisplayValue = (field: FormField, value: any) => {
     if (['select', 'autocomplete'].includes(field.type)) {

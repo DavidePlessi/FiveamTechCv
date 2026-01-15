@@ -47,33 +47,52 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
             var relAttr = prop.GetCustomAttribute<NodeRelationshipAttribute>();
             if (relAttr != null && relAttr.Type == NodeRelationType.Link)
             {
-                var val = prop.GetValue(node) as System.Collections.IEnumerable;
-                if (val != null)
+                if (typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType != typeof(string))
                 {
-                    var ids = new List<string>();
-                    foreach (var item in val)
+                    var val = prop.GetValue(node) as System.Collections.IEnumerable;
+                    if (val != null)
                     {
-                        if (item is BaseNode bn && !string.IsNullOrEmpty(bn.Id))
+                        var ids = new List<string>();
+                        foreach (var item in val)
                         {
-                            ids.Add(bn.Id);
+                            if (item is BaseNode bn && !string.IsNullOrEmpty(bn.Id))
+                            {
+                                ids.Add(bn.Id);
+                            }
+                        }
+                        
+                        if (ids.Any())
+                        {
+                            var paramName = $"{prop.Name}_ids";
+                            linkParams.Add(paramName, ids.ToArray());
+                            
+                            var targetType = prop.PropertyType.IsGenericType 
+                                ? prop.PropertyType.GetGenericArguments()[0] 
+                                : prop.PropertyType;
+                                
+                            queryBuilder.Append($" WITH n");
+                            queryBuilder.Append($" MATCH (t_{prop.Name}:{targetType.Name}) WHERE t_{prop.Name}.Id IN ${paramName}");
+                            queryBuilder.Append(relAttr.Incoming 
+                                ? $" MERGE (n)<-[:{relAttr.Name}]-(t_{prop.Name})" 
+                                : $" MERGE (n)-[:{relAttr.Name}]->(t_{prop.Name})");
                         }
                     }
-                    
-                    if (ids.Any())
-                    {
-                        var paramName = $"{prop.Name}_ids";
-                        linkParams.Add(paramName, ids.ToArray());
-                        
-                        var targetType = prop.PropertyType.IsGenericType 
-                            ? prop.PropertyType.GetGenericArguments()[0] 
-                            : prop.PropertyType;
-                            
-                        queryBuilder.Append($" WITH n");
-                        queryBuilder.Append($" MATCH (t_{prop.Name}:{targetType.Name}) WHERE t_{prop.Name}.Id IN ${paramName}");
-                        queryBuilder.Append(relAttr.Incoming 
-                            ? $" MERGE (n)<-[:{relAttr.Name}]-(t_{prop.Name})" 
-                            : $" MERGE (n)-[:{relAttr.Name}]->(t_{prop.Name})");
-                    }
+                }
+                else if (typeof(BaseNode).IsAssignableFrom(prop.PropertyType))
+                {
+                     var val = prop.GetValue(node) as BaseNode;
+                     if (val != null && !string.IsNullOrEmpty(val.Id))
+                     {
+                         var paramName = $"{prop.Name}_id";
+                         linkParams.Add(paramName, val.Id);
+                         var targetType = prop.PropertyType;
+
+                         queryBuilder.Append($" WITH n");
+                         queryBuilder.Append($" MATCH (t_{prop.Name}:{targetType.Name}) WHERE t_{prop.Name}.Id = ${paramName}");
+                         queryBuilder.Append(relAttr.Incoming 
+                             ? $" MERGE (n)<-[:{relAttr.Name}]-(t_{prop.Name})" 
+                             : $" MERGE (n)-[:{relAttr.Name}]->(t_{prop.Name})");
+                     }
                 }
             }
         }
@@ -118,39 +137,64 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
             var relAttr = prop.GetCustomAttribute<NodeRelationshipAttribute>();
             if (relAttr != null && relAttr.Type == NodeRelationType.Link)
             {
-                var targetType = prop.PropertyType.IsGenericType 
-                            ? prop.PropertyType.GetGenericArguments()[0] 
-                            : prop.PropertyType;
-
-                // Delete existing relationships of this type
-                queryBuilder.Append($" WITH n");
-                queryBuilder.Append($" OPTIONAL MATCH (n){(relAttr.Incoming ? "<" : "")}-[r_{prop.Name}:{relAttr.Name}]-{(relAttr.Incoming ? "" : ">")}(:{targetType.Name})");
-                queryBuilder.Append($" DELETE r_{prop.Name}");
-                
-                // Create new ones
-                var val = prop.GetValue(node) as System.Collections.IEnumerable;
-                if (val != null)
+                if (typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType != typeof(string))
                 {
-                    var ids = new List<string>();
-                    foreach (var item in val)
+                    var targetType = prop.PropertyType.IsGenericType 
+                                ? prop.PropertyType.GetGenericArguments()[0] 
+                                : prop.PropertyType;
+
+                    // Delete existing relationships of this type
+                    queryBuilder.Append($" WITH n");
+                    queryBuilder.Append($" OPTIONAL MATCH (n){(relAttr.Incoming ? "<" : "")}-[r_{prop.Name}:{relAttr.Name}]-{(relAttr.Incoming ? "" : ">")}(:{targetType.Name})");
+                    queryBuilder.Append($" DELETE r_{prop.Name}");
+                    
+                    // Create new ones
+                    var val = prop.GetValue(node) as System.Collections.IEnumerable;
+                    if (val != null)
                     {
-                         if (item is BaseNode bn && !string.IsNullOrEmpty(bn.Id))
+                        var ids = new List<string>();
+                        foreach (var item in val)
                         {
-                            ids.Add(bn.Id);
+                             if (item is BaseNode bn && !string.IsNullOrEmpty(bn.Id))
+                            {
+                                ids.Add(bn.Id);
+                            }
+                        }
+                        
+                        if (ids.Any())
+                        {
+                            var paramName = $"{prop.Name}_ids";
+                            linkParams.Add(paramName, ids.ToArray());
+                            
+                            queryBuilder.Append($" WITH n");
+                            queryBuilder.Append($" MATCH (t_{prop.Name}:{targetType.Name}) WHERE t_{prop.Name}.Id IN ${paramName}");
+                            queryBuilder.Append(relAttr.Incoming 
+                                ? $" MERGE (n)<-[:{relAttr.Name}]-(t_{prop.Name})" 
+                                : $" MERGE (n)-[:{relAttr.Name}]->(t_{prop.Name})");
                         }
                     }
-                    
-                    if (ids.Any())
-                    {
-                        var paramName = $"{prop.Name}_ids";
-                        linkParams.Add(paramName, ids.ToArray());
-                        
-                        queryBuilder.Append($" WITH n");
-                        queryBuilder.Append($" MATCH (t_{prop.Name}:{targetType.Name}) WHERE t_{prop.Name}.Id IN ${paramName}");
-                        queryBuilder.Append(relAttr.Incoming 
-                            ? $" MERGE (n)<-[:{relAttr.Name}]-(t_{prop.Name})" 
-                            : $" MERGE (n)-[:{relAttr.Name}]->(t_{prop.Name})");
-                    }
+                }
+                else if (typeof(BaseNode).IsAssignableFrom(prop.PropertyType))
+                {
+                     var targetType = prop.PropertyType;
+
+                     // Delete existing relationships of this type
+                     queryBuilder.Append($" WITH n");
+                     queryBuilder.Append($" OPTIONAL MATCH (n){(relAttr.Incoming ? "<" : "")}-[r_{prop.Name}:{relAttr.Name}]-{(relAttr.Incoming ? "" : ">")}(:{targetType.Name})");
+                     queryBuilder.Append($" DELETE r_{prop.Name}");
+
+                     var val = prop.GetValue(node) as BaseNode;
+                     if (val != null && !string.IsNullOrEmpty(val.Id))
+                     {
+                         var paramName = $"{prop.Name}_id";
+                         linkParams.Add(paramName, val.Id);
+                         
+                         queryBuilder.Append($" WITH n");
+                         queryBuilder.Append($" MATCH (t_{prop.Name}:{targetType.Name}) WHERE t_{prop.Name}.Id = ${paramName}");
+                         queryBuilder.Append(relAttr.Incoming 
+                             ? $" MERGE (n)<-[:{relAttr.Name}]-(t_{prop.Name})" 
+                             : $" MERGE (n)-[:{relAttr.Name}]->(t_{prop.Name})");
+                     }
                 }
             }
         }
@@ -368,7 +412,14 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
                 
                 // Collect related nodes into a list in the return statement
                 // The alias in return must match what ConvertToEntity expects (which is the property name)
-                returnBuilder.Append($", collect(DISTINCT({alias})) AS {prop.Name}");
+                if (typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType != typeof(string))
+                {
+                     returnBuilder.Append($", collect(DISTINCT({alias})) AS {prop.Name}");
+                }
+                else
+                {
+                     returnBuilder.Append($", head(collect(DISTINCT({alias}))) AS {prop.Name}");
+                }
             }
         }
         

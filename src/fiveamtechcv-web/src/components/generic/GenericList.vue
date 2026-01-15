@@ -319,6 +319,12 @@ const filteredItems = computed(() => {
 // Helper to get a title for the card (uses first header that isn't ID or actions, or explicitly 'name' or 'title')
 const getTitle = (item: any) => {
   const titleKey = props.headers.find(h => h.key === 'name' || h.key === 'title' || (h.key !== 'id' && h.key !== 'actions' && h.key !== 'order'))?.key;
-  return titleKey ? item[titleKey] : 'Item';
+  if (!titleKey) return 'Item';
+  
+  const val = item[titleKey];
+  if (val && typeof val === 'object' && 'name' in val) {
+      return val.name;
+  }
+  return val;
 };
 </script>

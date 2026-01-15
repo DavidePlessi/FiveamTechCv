@@ -163,7 +163,7 @@ const avgTagsPerProject = computed(() => {
 
 // Work Experience Stats
 const totalCompanies = computed(() => {
-    const companies = new Set(workExperiences.value.map(w => w.company?.trim()).filter(Boolean));
+    const companies = new Set(workExperiences.value.map(w => w.company?.name?.trim()).filter(Boolean));
     return companies.size;
 });
 
@@ -234,7 +234,7 @@ const avgCompanyTenure = computed(() => {
     const companyDurations: Record<string, number> = {};
 
     workExperiences.value.forEach(w => {
-        const company = w.company?.trim();
+        const company = w.company?.name?.trim();
         if (!company) return;
 
         const duration = calculateDurationInMonths(w.startDate, w.endDate);

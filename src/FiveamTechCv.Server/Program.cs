@@ -139,6 +139,8 @@ builder.Services
     .AddType<TaqQuery>()
     .AddType<ProjectQuery>()
     .AddType<WorkExperienceQuery>()
+    .AddType<PersonQuery>()
+    .AddType<CompanyQuery>()
     .AddNeo4JFiltering()
     .AddNeo4JSorting()
     .AddNeo4JProjections();
@@ -148,8 +150,10 @@ builder.Services
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IWorkExperienceService, WorkExperienceService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILocalizedStringService, LocalizedStringService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 builder.Services.AddFiveamTechCvApi(builder.Configuration);
 

@@ -28,25 +28,52 @@ export interface Tag extends BaseEntity {
 }
 
 export interface Project extends BaseEntity {
-    name: string;
+    name?: string;
     description?: LocalizedString[];
-    tagIdsToLink?: string[];
     tags?: Tag[];
+    people?: Person[];
+    tagIdsToLink?: string[];
+    personIdsToLink?: string[];
     order?: number;
 }
 
-export interface WorkExperience extends BaseEntity {
-    company?: string;
-    companyUrl?: string;
-    position?: string;
+export interface Company extends BaseEntity {
+    name?: string;
+    website?: string;
     description?: LocalizedString[];
+}
+
+export interface WorkExperience extends BaseEntity {
+    company?: Company;
+    companyIdToLink?: string;
+
+    position?: string;
     startDate?: string;
     endDate?: string;
-    projectIdsToLink?: string[];
+    description?: LocalizedString[];
     projects?: Project[];
-    tagIdsToLink?: string[];
     tags?: Tag[];
+    person?: Person;
+    projectIdsToLink?: string[];
+    tagIdsToLink?: string[];
+    personIdToLink?: string;
     order?: number;
+}
+
+export interface Person extends BaseEntity {
+    name?: string;
+    lastName?: string;
+    bornDate?: string;
+    info?: LocalizedString[];
+    summary?: LocalizedString[];
+    mindset?: LocalizedString[];
+    slogan?: LocalizedString[];
+    projects?: Project[];
+    workExperiences?: WorkExperience[];
+    tags?: Tag[];
+    projectIdsToLink?: string[];
+    workExperienceIdsToLink?: string[];
+    tagIdsToLink?: string[];
 }
 
 // Form Schema Types

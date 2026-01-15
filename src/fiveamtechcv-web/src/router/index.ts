@@ -49,6 +49,16 @@ const routes = [
         name: 'WorkExperiences',
         component: () => import('@/views/WorkExperienceView.vue'),
       },
+      {
+        path: 'people',
+        name: 'People',
+        component: () => import('@/views/PersonView.vue'),
+      },
+      {
+        path: 'companies',
+        name: 'Companies',
+        component: () => import('@/views/CompanyView.vue'),
+      },
     ],
   },
 ];

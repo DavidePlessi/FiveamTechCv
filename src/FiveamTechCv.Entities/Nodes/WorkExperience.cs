@@ -6,17 +6,14 @@ namespace FiveamTechCv.Entities.Nodes;
 
 public class WorkExperience : BaseNode
 {
-    public string? Company { get; set; }
-    public string? CompanyUrl { get; set; }
-    public string? Position { get; set; }
     
     [ParameterType(ParameterTypes.ZoneDateTime)]
     [GraphQLType("DateTime")]
     public DateTimeOffset StartDate { get; set; }
 
-    [ParameterType(ParameterTypes.ZoneDateTime)]
-    [GraphQLType("DateTime")]
     public DateTimeOffset? EndDate { get; set; }
+    
+    public string? Position { get; set; }
 
     public int? Order { get; set; }
     
@@ -36,6 +33,15 @@ public class WorkExperience : BaseNode
     [ParameterType(ParameterTypes.Ignore)]
     public List<Tag>? Tags { get; set; }
     
+    [Neo4JRelationship("HAS_COMPANY")]
+    [NodeRelationship("HAS_COMPANY", NodeRelationType.Link)]
+    [ParameterType(ParameterTypes.Ignore)]
+    public List<Company>? Companies { get; set; }
+
+    [Neo4JRelationship(FiveamTechCv.Entities.Nodes.Person.HAS_WORK_EXPERIENCE, RelationshipDirection.Incoming)]
+    [ParameterType(ParameterTypes.Ignore)]
+    public List<Person>? People { get; set; }
+    
     // To Project
     public const string HAS_PROJECT = "HAS_PROJECT";
     
@@ -44,4 +50,7 @@ public class WorkExperience : BaseNode
     
     //To Description
     public const string HAS_DESCRIPTION = "HAS_DESCRIPTION";
+    
+    // To Company
+    public const string HAS_COMPANY = "HAS_COMPANY";
 }
