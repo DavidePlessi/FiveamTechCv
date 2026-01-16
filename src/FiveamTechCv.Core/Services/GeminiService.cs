@@ -71,8 +71,38 @@ public class GeminiService : IGeminiService
         
         if (!response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException($"Gemini API Error (Generation): {response.StatusCode} - {error}");
+            var errorContent = await response.Content.ReadAsStringAsync();
+            
+            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            {
+                // Try to parse the error to see if it's RPM or RPD
+                // The error format from Gemini usually contains details in JSON
+                // Example: { "error": { "code": 429, "message": "Resource has been exhausted (e.g. check quota).", "status": "RESOURCE_EXHAUSTED" } }
+                // Sometimes the message contains "RPM" or "RPD" or "TPM"
+                
+                string userMessage = "I'm currently receiving too many requests. Please try again tomorrow.";
+                
+                if (errorContent.Contains("RPM", StringComparison.OrdinalIgnoreCase) || 
+                    errorContent.Contains("requests per minute", StringComparison.OrdinalIgnoreCase))
+                {
+                    userMessage = "I'm a bit overwhelmed right now (RPM limit). Please give me a minute to catch my breath.";
+                }
+                else if (errorContent.Contains("RPD", StringComparison.OrdinalIgnoreCase) || 
+                         errorContent.Contains("requests per day", StringComparison.OrdinalIgnoreCase))
+                {
+                    userMessage = "I've reached my daily limit of thoughts (RPD limit). Please come back tomorrow!";
+                }
+                else if (errorContent.Contains("TPM", StringComparison.OrdinalIgnoreCase) || 
+                         errorContent.Contains("tokens per minute", StringComparison.OrdinalIgnoreCase))
+                {
+                     userMessage = "That was a lot to process at once (TPM limit). Please try a shorter question or wait a moment.";
+                }
+
+                // Return the friendly message instead of throwing, so the UI can display it
+                return userMessage;
+            }
+
+            throw new HttpRequestException($"Gemini API Error (Generation): {response.StatusCode} - {errorContent}");
         }
 
         var result = await response.Content.ReadFromJsonAsync<GenerationResponse>(JsonOptions);

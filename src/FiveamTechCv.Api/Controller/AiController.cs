@@ -83,6 +83,7 @@ public class AiController : ControllerBase
     }
 
     [HttpPost("search")]
+    [Authorize]
     public async Task<IActionResult> Search([FromBody] SearchRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Query))
