@@ -36,7 +36,14 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
         var param = node.ConvertToParameters();
         
         var queryBuilder = new StringBuilder();
-        queryBuilder.Append($"CREATE (n:{typeof(T).Name} $props)");
+        
+        var labels = new List<string> { typeof(T).Name };
+        if (typeof(IVectorizable).IsAssignableFrom(typeof(T)))
+        {
+            labels.Add("Vectorizable");
+        }
+        
+        queryBuilder.Append($"CREATE (n:{string.Join(":", labels)} $props)");
         
         // Handle Links
         var properties = typeof(T).GetProperties();
@@ -117,6 +124,12 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
 
         // Handle Creations
         await HandleCreateRelationsAsync(id, node);
+
+        // Generate Embedding after creation (to have all linked entities)
+        if (node is IVectorizable)
+        {
+            await GenerateAndSaveEmbeddingAsync(id);
+        }
         
         return id;
     }
@@ -124,10 +137,17 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
     public virtual async Task<T> UpdateAsync(T node)
     {
         node.UpdatedAt = DateTime.UtcNow.Ticks;
+        
+        
         var param = node.ConvertToParameters();
         
         var queryBuilder = new StringBuilder();
         queryBuilder.Append($"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id SET n += $props");
+        
+        if (typeof(IVectorizable).IsAssignableFrom(typeof(T)))
+        {
+            queryBuilder.Append(" SET n:Vectorizable");
+        }
         
         var properties = typeof(T).GetProperties();
         var linkParams = new Dictionary<string, object>();
@@ -213,6 +233,12 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
         // The old logic in HandleRelationsAsync did: delete old nodes, create new ones.
         // We'll reproduce that behavior using inspections of T.
         await HandleCreateRelationsAsync(node.Id, node, true);
+
+        // Generate Embedding after update (to have all linked entities)
+        if (node is IVectorizable)
+        {
+            await GenerateAndSaveEmbeddingAsync(node.Id);
+        }
         
         return query.Select(r => r.ConvertToEntity<T>()).Single();
     }
@@ -241,12 +267,6 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
 
                  if (clearExisting)
                  {
-                     // Fetch current entity to get old IDs to delete?
-                     // Or just query related nodes and delete them via service?
-                     // "MATCH (n)-[:REL]-(target) RETURN target.Id"
-                     // Then call service.DeleteAsync(id).
-                     // This mimics old behavior.
-                     
                      var targetType = prop.PropertyType.IsGenericType 
                             ? prop.PropertyType.GetGenericArguments()[0] 
                             : prop.PropertyType;
@@ -275,9 +295,6 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
                  {
                      foreach (var item in list)
                      {
-                         // item is BaseNode.
-                         // But CreateAsync takes TNode.
-                         // Reflection Invoke should work.
                          var task = createMethod.Invoke(serviceInstance, new[] { item }) as Task<string>;
                          if (task != null)
                          {
@@ -424,5 +441,38 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
         }
         
         return (matchBuilder.ToString(), returnBuilder.ToString());
+    }
+
+    private async Task GenerateAndSaveEmbeddingAsync(string id)
+    {
+        // 1. Fetch full entity (with relations)
+        var fullNode = await GetByIdAsync(id);
+        if (fullNode is IVectorizable vectorizable)
+        {
+            var content = vectorizable.GetContentToEmbed();
+            if (!string.IsNullOrEmpty(content))
+            {
+                var geminiService = _serviceProvider.GetService(typeof(IGeminiService)) as IGeminiService;
+                if (geminiService != null)
+                {
+                    try
+                    {
+                        var embedding = await geminiService.GenerateEmbeddingAsync(content);
+                        
+                        // 2. Save only the embedding
+                        await _driver.ExecutableQuery(
+                            $"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id SET n.Embedding = $embedding, n:Vectorizable"
+                        )
+                        .WithParameters(new { id, embedding })
+                        .WithConfig(_queryConfig)
+                        .ExecuteAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Embedding generation failed: {ex.Message}");
+                    }
+                }
+            }
+        }
     }
 }

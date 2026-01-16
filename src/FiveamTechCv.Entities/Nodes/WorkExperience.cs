@@ -4,7 +4,7 @@ using HotChocolate;
 
 namespace FiveamTechCv.Entities.Nodes;
 
-public class WorkExperience : BaseNode
+public class WorkExperience : BaseNode, IVectorizable 
 {
     
     [ParameterType(ParameterTypes.ZoneDateTime)]
@@ -53,4 +53,14 @@ public class WorkExperience : BaseNode
     
     // To Company
     public const string HAS_COMPANY = "HAS_COMPANY";
+
+    public List<float>? Embedding { get; set; }
+
+    public string? GetContentToEmbed()
+    {
+        var desc = Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)).Aggregate((a, b) => $"{a}. {b}") ?? "";
+        var companies = Companies?.Select(c => c.Name).Where(c => !string.IsNullOrEmpty(c)).Aggregate((a, b) => $"{a}, {b}") ?? "";
+        var companyStr = !string.IsNullOrEmpty(companies) ? $" at {companies}" : "";
+        return $"Work Experience: {Position}{companyStr}. {desc}";
+    }
 }

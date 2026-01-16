@@ -16,7 +16,7 @@ public enum TagType
     Category
 }
 
-public class Tag : BaseNode
+public class Tag : BaseNode, IVectorizable 
 {
     public string? Name { get; set; }
     public TagType? Type { get; set; }
@@ -27,4 +27,11 @@ public class Tag : BaseNode
     [NodeRelationship("HAS_TAG", NodeRelationType.Link, true)]
     [ParameterType(ParameterTypes.Ignore)]
     public List<Project>? Projects { get; set; }
+
+    public List<float>? Embedding { get; set; }
+
+    public string? GetContentToEmbed()
+    {
+        return $"Tag: {Name} (Type: {Type})";
+    }
 }

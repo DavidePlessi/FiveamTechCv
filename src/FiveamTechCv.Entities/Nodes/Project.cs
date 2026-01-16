@@ -3,7 +3,7 @@ using HotChocolate.Data.Neo4J;
 
 namespace FiveamTechCv.Entities.Nodes;
 
-public class Project : BaseNode
+public class Project : BaseNode, IVectorizable 
 {
     public string Name { get; set; }
     public int? Order { get; set; }
@@ -27,4 +27,12 @@ public class Project : BaseNode
     [Neo4JRelationship(Person.HAS_PROJECT, RelationshipDirection.Incoming)]
     [ParameterType(ParameterTypes.Ignore)]
     public List<Person>? People { get; set; }
+
+    public List<float>? Embedding { get; set; }
+
+    public string? GetContentToEmbed()
+    {
+        var desc = Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)).Aggregate((a, b) => $"{a}. {b}") ?? "";
+        return $"Project: {Name}. {desc}";
+    }
 }

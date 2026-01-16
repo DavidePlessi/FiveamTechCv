@@ -160,6 +160,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILocalizedStringService, LocalizedStringService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
+builder.Services.AddScoped<IVectorSearchService, VectorSearchService>();
+builder.Services.AddScoped<IAiCVService, AiCVService>();
+
 builder.Services.AddFiveamTechCvApi(builder.Configuration);
 
 

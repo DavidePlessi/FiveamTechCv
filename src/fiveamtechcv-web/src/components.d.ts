@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AiConsole: typeof import('./components/AiConsole.vue')['default']
     CyberChip: typeof import('./components/shared/CyberChip.vue')['default']
     CyberDatepicker: typeof import('./components/shared/CyberDatepicker.vue')['default']
     CyberHeader: typeof import('./components/shared/CyberHeader.vue')['default']

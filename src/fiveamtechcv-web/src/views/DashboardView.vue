@@ -1,6 +1,19 @@
 <template>
   <div class="dashboard-container">
-    <cyber-header title="Dashboard" />
+    <cyber-header title="Dashboard">
+        <v-btn
+            prepend-icon="mdi-console"
+            color="#0f0"
+            variant="outlined"
+            class="stats-card-decoration"
+            style="border-color: #0f0; color: #0f0;"
+            @click="isConsoleOpen = true"
+        >
+            AI TERMINAL
+        </v-btn>
+    </cyber-header>
+
+    <ai-console :is-open="isConsoleOpen" @close="isConsoleOpen = false" />
 
     <v-row>
       <!-- Stats Cards -->
@@ -146,11 +159,13 @@ import { TagType } from '@/types/entities';
 import CyberHeader from '@/components/shared/CyberHeader.vue';
 import StatCard from '@/components/dashboard/StatCard.vue';
 import MonitorPanel from '@/components/dashboard/MonitorPanel.vue';
+import AiConsole from '@/components/AiConsole.vue';
 
 const tags = ref<Tag[]>([]);
 const projects = ref<Project[]>([]);
 const workExperiences = ref<WorkExperience[]>([]);
 const loading = ref(true);
+const isConsoleOpen = ref(false);
 
 const totalTags = computed(() => tags.value.length);
 const totalProjects = computed(() => projects.value.length);
