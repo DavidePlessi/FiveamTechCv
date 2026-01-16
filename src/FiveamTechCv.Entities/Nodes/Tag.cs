@@ -13,10 +13,11 @@ public enum TagType
     Database,
     Platform,
     Area,
-    Category
+    Category,
+    Role
 }
 
-public class Tag : BaseNode, IVectorizable 
+public class Tag : BaseVectorizableNode
 {
     public string? Name { get; set; }
     public TagType? Type { get; set; }
@@ -27,8 +28,6 @@ public class Tag : BaseNode, IVectorizable
     [NodeRelationship("HAS_TAG", NodeRelationType.Link, true)]
     [ParameterType(ParameterTypes.Ignore)]
     public List<Project>? Projects { get; set; }
-
-    public List<float>? Embedding { get; set; }
 
     public string? GetContentToEmbed()
     {

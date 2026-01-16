@@ -9,6 +9,24 @@ public class AiCVService : IAiCVService
 {
     private readonly IVectorSearchService _vectorSearchService;
     private readonly IGeminiService _geminiService;
+    
+    private const string SystemPrompt = @"
+You are the ""Fiveam Tech Interface,"" a technical system agent designed to provide data regarding Davide Plessi’s professional profile, his architecture work, and Fiveam Tech.
+Core Persona:
+- Tone: Pragmatic, engineering-focused, and concise.
+- Style: Zero-fluff. Avoid marketing buzzwords (e.g., ""groundbreaking,"" ""passionate,"" ""revolutionary""). Use architectural and technical terms accurately.
+- Philosophy: Embody the ""Fiveam Mindset""—discipline, reliability, and root-cause analysis.
+
+Domain Constraints (The ""Hard"" Rules):
+- Exclusive Knowledge: Answer ONLY questions regarding Davide Plessi, his professional experience, projects (e.g., Art4Art, Cinopedia.cloud, Makes It Beautiful), his tech stack (.NET, Neo4j, GraphQL, Vue.js, DevOps), and his approach to software architecture.
+- Refusal Parameter: If a user asks about anything outside this domain (weather, politics, generic coding help not related to Davide’s stack, personal life secrets), respond with: ""Query outside indexed domain. I can only provide information regarding Davide Plessi’s professional profile, projects, and technical architecture.""
+- The Tech Stack: If asked about technologies, emphasize why he uses them (e.g., Neo4j for graph-based data relationships, .NET for high-performance backends).
+- No Hallucinations: If information is not present in the provided context, state: ""Data not indexed for this specific query.""
+
+Interaction Style:
+- Use technical bullet points for lists.
+- Maintain a ""Terminal/System"" vibe in responses.
+";
 
     public AiCVService(IVectorSearchService vectorSearchService, IGeminiService geminiService)
     {
@@ -16,7 +34,7 @@ public class AiCVService : IAiCVService
         _geminiService = geminiService;
     }
 
-    public async Task<string> AskAsync(string question)
+    public async Task<string> AskAsync(string question, List<string> history)
     {
         // 1. Retrieve relevant nodes
         var nodes = await _vectorSearchService.SearchAsync(question);
@@ -30,32 +48,37 @@ public class AiCVService : IAiCVService
         var contextBuilder = new StringBuilder();
         foreach (var node in nodes)
         {
-            if (node is IVectorizable vectorizable)
-            {
-                contextBuilder.AppendLine(vectorizable.GetContentToEmbed());
-            }
-            else
-            {
-                 // Fallback if not IVectorizable, though VectorSearchService filters for specific types currently
-                 contextBuilder.AppendLine($"Node Id: {node.Id}");
-            }
+            contextBuilder.AppendLine($"Node description: {node.EmbeddedString}. Node: {node.Properties}");
         }
 
         var context = contextBuilder.ToString();
+        
+        // 3. Build History
+        var historyBuilder = new StringBuilder();
+        if (history != null && history.Any())
+        {
+            historyBuilder.AppendLine("Conversation History:");
+            foreach (var item in history)
+            {
+                historyBuilder.AppendLine(item);
+            }
+        }
+        var historyContext = historyBuilder.ToString();
 
-        // 3. Construct Prompt
-        var systemPrompt = $@"You are an AI assistant for a professional CV. 
-Your goal is to answer questions about the candidate's experience, projects, and skills based STRICTLY on the provided context.
-Do not invent information. If the answer is not in the context, state clearly that you do not have that information.
+        // 4. Construct Prompt
+        var systemPrompt = $@"
+{SystemPrompt}
 
 Context:
 {context}
+
+{historyContext}
 
 Question: {question}
 
 Answer:";
 
-        // 4. Generate Response
+        // 5. Generate Response
         return await _geminiService.GenerateResponseAsync(systemPrompt);
     }
 }

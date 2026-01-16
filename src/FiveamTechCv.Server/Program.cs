@@ -164,6 +164,7 @@ builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IVectorSearchService, VectorSearchService>();
 builder.Services.AddScoped<IAiCVService, AiCVService>();
 
+builder.Services.AddHttpClient<IRecaptchaService, RecaptchaService>();
 builder.Services.AddFiveamTechCvApi(builder.Configuration);
 
 

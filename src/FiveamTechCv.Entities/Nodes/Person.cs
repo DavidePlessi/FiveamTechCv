@@ -4,7 +4,7 @@ using HotChocolate;
 
 namespace FiveamTechCv.Entities.Nodes;
 
-public class Person : BaseNode
+public class Person : BaseVectorizableNode
 {
     public string? Name { get; set; }
     public string? LastName { get; set; }
@@ -56,4 +56,29 @@ public class Person : BaseNode
     public const string HAS_PROJECT = "HAS_PROJECT";
     public const string HAS_WORK_EXPERIENCE = "HAS_WORK_EXPERIENCE";
     public const string HAS_TAG = "HAS_TAG";
+
+    public override string? GetContentToEmbed()
+    {
+        var info = string.Join(". ", Info?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
+        var summary = string.Join(". ", Summary?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
+        var mindset = string.Join(". ", Mindset?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
+        var slogan = string.Join(". ", Slogan?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
+        
+        var tagsStr = "";
+        if (Tags != null && Tags.Any())
+        {
+            var groupedTags = Tags
+                .Where(t => t.Type.HasValue && !string.IsNullOrEmpty(t.Name))
+                .GroupBy(t => t.Type.Value)
+                .Select(g => $"{g.Key}: {string.Join(", ", g.Select(t => t.Name))}");
+            
+            tagsStr = string.Join(". ", groupedTags);
+            if (!string.IsNullOrEmpty(tagsStr))
+            {
+                tagsStr = $". Tags: {tagsStr}";
+            }
+        }
+
+        return $"Person: {Name} {LastName}. Info: {info}. Summary: {summary}. Mindset: {mindset}. Slogan: {slogan}{tagsStr}";
+    }
 }

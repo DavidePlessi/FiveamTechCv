@@ -1,6 +1,7 @@
 <template>
   <div>
     <cyber-header title="Tags" subtitle="Tags allow for flexible categorization of content across the application.">
+      <v-btn v-if="authStore.isAuthenticated" color="primary" prepend-icon="mdi-plus" @click="openDialog()">Add Tag</v-btn>
     </cyber-header>
 
     <generic-list
@@ -117,7 +118,7 @@ const filteredTags = computed(() => {
     if (!contextStore.selectedPersonId) {
         return tags.value;
     }
-    
+
     // 1. Find projects related to this person
     const personProjectIds = new Set<string>();
     allProjectsRaw.value.forEach(p => {
@@ -130,7 +131,7 @@ const filteredTags = computed(() => {
     // Note: The Tag entity on 'tags' list might have 'projects' populated (if backend sends it).
     // If not, we have to rely on the project's 'tags' list.
     // The TagView template uses item.projects, so tags.value likely has projects.
-    
+
     return tags.value.filter(tag => {
         if (!tag.projects) return false;
         // Check if any of the tag's projects are in the person's project list

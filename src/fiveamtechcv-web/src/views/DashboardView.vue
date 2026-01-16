@@ -9,7 +9,7 @@
             style="border-color: #0f0; color: #0f0;"
             @click="isConsoleOpen = true"
         >
-            AI TERMINAL
+            AI CONSOLE
         </v-btn>
     </cyber-header>
 

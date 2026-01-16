@@ -461,9 +461,9 @@ public abstract class BaseService<T, TFilter> : INodeService<T, TFilter>
                         
                         // 2. Save only the embedding
                         await _driver.ExecutableQuery(
-                            $"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id SET n.Embedding = $embedding, n:Vectorizable"
+                            $"MATCH (n:{typeof(T).Name}) WHERE n.Id = $id SET n.Embedding = $embedding, n:Vectorizable, n.EmbeddedString = $content"
                         )
-                        .WithParameters(new { id, embedding })
+                        .WithParameters(new { id, embedding, content })
                         .WithConfig(_queryConfig)
                         .ExecuteAsync();
                     }

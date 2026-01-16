@@ -1,4 +1,5 @@
 using FiveamTechCv.Abstract.Services;
+using FiveamTechCv.Api.Attributes;
 using HotChocolate.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ public class AiController : ControllerBase
     }
 
     [HttpPost("ask")]
+    [Recaptcha]
     public async Task<IActionResult> Ask([FromBody] AskRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Question))
@@ -27,7 +29,7 @@ public class AiController : ControllerBase
 
         try 
         {
-            var answer = await _aiService.AskAsync(request.Question);
+            var answer = await _aiService.AskAsync(request.Question, request.History);
             return Ok(new { Answer = answer });
         }
         catch (Exception ex)
@@ -58,9 +60,57 @@ public class AiController : ControllerBase
             return StatusCode(500, "An error occurred while creating the index.");
         }
     }
+
+    [HttpPost("recalculate-embeddings")]
+    [Authorize]
+    public async Task<IActionResult> RecalculateEmbeddings()
+    {
+        var isAdmin = User.Claims.FirstOrDefault(c => c.Type == "IsAdmin")?.Value == "true";
+        if(!isAdmin)
+        {
+            return Unauthorized("Unauthorized action");
+        }
+        try
+        {
+            await _vectorSearchService.RecalculateEmbeddingsAsync();
+            return Ok("Embeddings recalculated successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "An error occurred while recalculating embeddings.");
+        }
+    }
+
+    [HttpPost("search")]
+    public async Task<IActionResult> Search([FromBody] SearchRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return BadRequest("Query is required.");
+        }
+
+        try
+        {
+            var results = await _vectorSearchService.SearchAsync(request.Query, request.K);
+            return Ok(results);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return StatusCode(500, "An error occurred while searching.");
+        }
+    }
 }
 
 public class AskRequest
 {
     public string? Question { get; set; }
+    public List<string> History { get; set; } = new();
+}
+
+public class SearchRequest
+{
+    public string? Query { get; set; }
+    public int K { get; set; } = 5;
 }

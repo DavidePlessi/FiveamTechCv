@@ -39,10 +39,10 @@
     <!-- Cyber Dock Navigation -->
     <nav class="cyber-dock">
       <!-- Person Filter Toggle -->
-      <a class="dock-item" :class="{ active: showPersonSelector || contextStore.selectedPersonId }" @click="togglePersonSelector" style="cursor: pointer;">
+      <!-- <a class="dock-item" :class="{ active: showPersonSelector || contextStore.selectedPersonId }" @click="togglePersonSelector" style="cursor: pointer;">
         <v-icon :color="contextStore.selectedPersonId ? 'primary' : ''">mdi-account-filter</v-icon>
         <span class="dock-tooltip">{{ personSelectorTooltip }}</span>
-      </a>
+      </a> -->
 
       <router-link to="/" class="dock-item" :class="{ active: $route.path === '/' }">
         <v-icon>mdi-home</v-icon>

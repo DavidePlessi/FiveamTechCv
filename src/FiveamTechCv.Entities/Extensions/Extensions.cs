@@ -65,6 +65,11 @@ public static class Extensions
 
             var value = properties.GetValueOrDefault(propName);
             
+            if (typeProperty.Name == "Id" && value == null)
+            {
+                value = node.ElementId;
+            }
+            
             var underlyingType = Nullable.GetUnderlyingType(typeProperty.PropertyType);
             
             if (underlyingType?.IsEnum == true &&
@@ -106,6 +111,11 @@ public static class Extensions
 
             var propName = parameterTypeAttribute?.PropertyName ?? typeProperty?.Name;
             var value = properties.GetValueOrDefault(propName);
+            
+            if (typeProperty.Name == "Id" && value == null)
+            {
+                value = node.ElementId;
+            }
             
             var underlyingType = Nullable.GetUnderlyingType(typeProperty.PropertyType);
             

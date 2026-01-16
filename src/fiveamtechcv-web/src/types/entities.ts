@@ -6,7 +6,8 @@ export enum TagType {
     Database = 4,
     Platform = 5,
     Area = 6,
-    Category = 7
+    Category = 7,
+    Role=8
 }
 
 export interface BaseEntity {

@@ -1,9 +1,9 @@
-﻿﻿using FiveamTechCv.Entities.Attributes;
+﻿using FiveamTechCv.Entities.Attributes;
 using HotChocolate.Data.Neo4J;
 
 namespace FiveamTechCv.Entities.Nodes;
 
-public class Project : BaseNode, IVectorizable 
+public class Project : BaseVectorizableNode
 {
     public string Name { get; set; }
     public int? Order { get; set; }
@@ -28,11 +28,27 @@ public class Project : BaseNode, IVectorizable
     [ParameterType(ParameterTypes.Ignore)]
     public List<Person>? People { get; set; }
 
-    public List<float>? Embedding { get; set; }
-
     public string? GetContentToEmbed()
     {
-        var desc = Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)).Aggregate((a, b) => $"{a}. {b}") ?? "";
-        return $"Project: {Name}. {desc}";
+        var desc = string.Join(". ", Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
+        var people = string.Join(", ", People?.Select(p => $"{p.Name} {p.LastName}").Where(n => !string.IsNullOrWhiteSpace(n)) ?? Array.Empty<string>());
+        var peopleStr = !string.IsNullOrEmpty(people) ? $" (Person: {people})" : "";
+        
+        var tagsStr = "";
+        if (Tags != null && Tags.Any())
+        {
+            var groupedTags = Tags
+                .Where(t => t.Type.HasValue && !string.IsNullOrEmpty(t.Name))
+                .GroupBy(t => t.Type.Value)
+                .Select(g => $"{g.Key}: {string.Join(", ", g.Select(t => t.Name))}");
+            
+            tagsStr = string.Join(". ", groupedTags);
+            if (!string.IsNullOrEmpty(tagsStr))
+            {
+                tagsStr = $". Tags: {tagsStr}";
+            }
+        }
+
+        return $"Project: {Name}{peopleStr}. {desc}{tagsStr}";
     }
 }

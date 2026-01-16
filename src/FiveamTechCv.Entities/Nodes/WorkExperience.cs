@@ -4,7 +4,7 @@ using HotChocolate;
 
 namespace FiveamTechCv.Entities.Nodes;
 
-public class WorkExperience : BaseNode, IVectorizable 
+public class WorkExperience : BaseVectorizableNode
 {
     
     [ParameterType(ParameterTypes.ZoneDateTime)]
@@ -54,13 +54,29 @@ public class WorkExperience : BaseNode, IVectorizable
     // To Company
     public const string HAS_COMPANY = "HAS_COMPANY";
 
-    public List<float>? Embedding { get; set; }
-
     public string? GetContentToEmbed()
     {
-        var desc = Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)).Aggregate((a, b) => $"{a}. {b}") ?? "";
-        var companies = Companies?.Select(c => c.Name).Where(c => !string.IsNullOrEmpty(c)).Aggregate((a, b) => $"{a}, {b}") ?? "";
+        var desc = string.Join(". ", Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
+        var companies = string.Join(", ", Companies?.Select(c => c.Name).Where(c => !string.IsNullOrEmpty(c)) ?? Array.Empty<string>());
         var companyStr = !string.IsNullOrEmpty(companies) ? $" at {companies}" : "";
-        return $"Work Experience: {Position}{companyStr}. {desc}";
+        var people = string.Join(", ", People?.Select(p => $"{p.Name} {p.LastName}").Where(n => !string.IsNullOrWhiteSpace(n)) ?? Array.Empty<string>());
+        var peopleStr = !string.IsNullOrEmpty(people) ? $" (Person: {people})" : "";
+        
+        var tagsStr = "";
+        if (Tags != null && Tags.Any())
+        {
+            var groupedTags = Tags
+                .Where(t => t.Type.HasValue && !string.IsNullOrEmpty(t.Name))
+                .GroupBy(t => t.Type.Value)
+                .Select(g => $"{g.Key}: {string.Join(", ", g.Select(t => t.Name))}");
+            
+            tagsStr = string.Join(". ", groupedTags);
+            if (!string.IsNullOrEmpty(tagsStr))
+            {
+                tagsStr = $". Tags: {tagsStr}";
+            }
+        }
+        
+        return $"Work Experience: {Position}{companyStr}{peopleStr}. {desc}.{tagsStr}";
     }
 }
