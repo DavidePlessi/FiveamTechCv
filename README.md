@@ -14,12 +14,13 @@
 > **Note:** This project is currently under active development and is **not ready for production**.
 
 ### 🚀 Upcoming Features
+- [ ] **Generalization and multi-person improvment**: Remove the project specialization on my data and handle the possibility to manage more than one person.
 - [x] **Work Experience**: Tracking and visualization of career history.
 - [x] **Comapnies**: Create and handle companies linked to work experience.
 - [x] **People**: Personal profile management linked to work experience and projects.
 - [ ] **User Permissions**: Implement user permission on companies and people
 - [ ] **Studies**: Comprehensive education mapping.
-- [ ] **AI Integration**: AI-powered data interaction and analysis.
+- [x] **AI Integration**: Neo4j vector index search, Nodes Embeddings, RAG agent, AI console for data discovery.
 
 ---
 
