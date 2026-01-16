@@ -1692,10 +1692,34 @@ footer {
 
 
     .cyber-dock {
-        padding: 10px 15px;
-        width: 90%;
-        justify-content: space-around;
-        bottom: 20px;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        transform: none;
+        border-radius: 0;
+        border-right: none;
+        border-left: none;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 8px 10px;
+        gap: 8px;
+        /* Hide scrollbar but keep functionality */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .cyber-dock::-webkit-scrollbar {
+        display: none;
+    }
+
+    .dock-item {
+        flex: 0 0 auto;
+        /* Don't shrink */
+        width: 44px;
+        /* Slightly larger for touch */
+        height: 44px;
     }
 
     .dock-item {

@@ -4,7 +4,7 @@
     </cyber-header>
 
     <generic-list
-      :items="tags"
+      :items="filteredTags"
       :headers="headers"
       :loading="loading"
       :filter-schema="filterSchema"
@@ -94,16 +94,49 @@ import { TagType } from '@/types/entities';
 import { tagService } from '@/services/tagService';
 import { projectService } from '@/services/projectService';
 import { useAuthStore } from '@/stores/auth';
+import { useContextStore } from '@/stores/context';
 
 const { mobile } = useDisplay();
 const authStore = useAuthStore();
+const contextStore = useContextStore();
 const tags = ref<Tag[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
 const detailDialog = ref(false);
 const editedItem = ref<Tag>({});
 const detailItem = ref<Tag>({});
-const projects = ref<any[]>([]);
+const projects = ref<any[]>([]); // These are lightweight for dropdown, but we need full projects for filter logic?
+// actually loadData maps projects to {text, value}. We might need the full objects.
+// Let's check loadData. It fetches projectService.getAll().
+// But it assigns projects.value = fetchedProjects.map(...)
+// We need to keep the full projects list to filter tags properly.
+
+const allProjectsRaw = ref<any[]>([]);
+
+const filteredTags = computed(() => {
+    if (!contextStore.selectedPersonId) {
+        return tags.value;
+    }
+    
+    // 1. Find projects related to this person
+    const personProjectIds = new Set<string>();
+    allProjectsRaw.value.forEach(p => {
+        if (p.people && p.people.some((per: any) => per.id === contextStore.selectedPersonId)) {
+            personProjectIds.add(p.id);
+        }
+    });
+
+    // 2. Filter tags that are linked to these projects
+    // Note: The Tag entity on 'tags' list might have 'projects' populated (if backend sends it).
+    // If not, we have to rely on the project's 'tags' list.
+    // The TagView template uses item.projects, so tags.value likely has projects.
+    
+    return tags.value.filter(tag => {
+        if (!tag.projects) return false;
+        // Check if any of the tag's projects are in the person's project list
+        return tag.projects.some(tp => personProjectIds.has(tp.id!));
+    });
+});
 
 const headers = computed(() => {
   const baseHeaders = [
@@ -150,6 +183,7 @@ const loadData = async () => {
       projectService.getAll()
     ]);
     tags.value = fetchedTags;
+    allProjectsRaw.value = fetchedProjects;
     projects.value = fetchedProjects.map(p => ({ text: p.name, value: p.id }));
 
     const projectField = tagSchema.value.fields.find(f => f.key === 'projectIdsToLink');

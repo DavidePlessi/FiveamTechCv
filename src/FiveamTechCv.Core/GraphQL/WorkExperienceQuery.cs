@@ -15,7 +15,7 @@ public class WorkExperienceQuery
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public Neo4JExecutable<WorkExperience> GetTags(
+    public Neo4JExecutable<WorkExperience> GetWorkExperiences(
         [ScopedService] IAsyncSession session
     ) => new (session);
     

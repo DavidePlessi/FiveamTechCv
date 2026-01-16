@@ -8,7 +8,7 @@
     </cyber-header>
 
     <generic-list
-      :items="projects"
+      :items="filteredProjects"
       :headers="headers"
       :loading="loading"
       :filter-schema="filterSchema"
@@ -109,9 +109,11 @@ import { projectService } from '@/services/projectService';
 import { tagService } from '@/services/tagService';
 import { personService } from '@/services/personService';
 import { useAuthStore } from '@/stores/auth';
+import { useContextStore } from '@/stores/context';
 
 const { mobile } = useDisplay();
 const authStore = useAuthStore();
+const contextStore = useContextStore();
 const projects = ref<Project[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
@@ -120,6 +122,13 @@ const editedItem = ref<Project>({ name: '', description: [], tagIdsToLink: [], p
 const detailItem = ref<Project>({ name: '', description: [], tagIdsToLink: [], personIdsToLink: [] });
 const tags = ref<any[]>([]);
 const people = ref<any[]>([]);
+
+const filteredProjects = computed(() => {
+    if (!contextStore.selectedPersonId) {
+        return projects.value;
+    }
+    return projects.value.filter(p => p.people && p.people.some(per => per.id === contextStore.selectedPersonId));
+});
 
 const headers = computed(() => {
   const baseHeaders = [

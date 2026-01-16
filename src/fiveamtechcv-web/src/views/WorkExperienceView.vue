@@ -8,7 +8,7 @@
     </cyber-header>
 
     <generic-list
-      :items="items"
+      :items="filteredItems"
       :headers="headers"
       :loading="loading"
       :filter-schema="filterSchema"
@@ -121,10 +121,12 @@ import { tagService } from '@/services/tagService';
 import { personService } from '@/services/personService';
 import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
+import { useContextStore } from '@/stores/context';
 import { formatDate } from '@/utils/date';
 
 const { mobile } = useDisplay();
 const authStore = useAuthStore();
+const contextStore = useContextStore();
 const items = ref<WorkExperience[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
@@ -278,6 +280,13 @@ const loadData = async () => {
     loading.value = false;
   }
 };
+
+const filteredItems = computed(() => {
+    if (!contextStore.selectedPersonId) {
+        return items.value;
+    }
+    return items.value.filter(item => item.person && item.person.id === contextStore.selectedPersonId);
+});
 
 onMounted(loadData);
 

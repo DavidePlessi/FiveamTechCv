@@ -135,15 +135,20 @@ builder.Services.AddSingleton<IDriver>(sp => sp.GetRequiredService<GraphDriver>(
 
 builder.Services
     .AddGraphQLServer()
+    .AddNeo4JProjections()
+    .AddNeo4JFiltering()
+    .AddNeo4JSorting()
     .AddQueryType(q => q.Name("Query"))
-    .AddType<TaqQuery>()
+    .AddType<FiveamTechCv.Entities.Nodes.Tag>()
+    .AddType<Project>()
+    .AddType<WorkExperience>()
+    .AddType<Person>()
+    .AddType<Company>()
+    .AddType<TagQuery>()
     .AddType<ProjectQuery>()
     .AddType<WorkExperienceQuery>()
     .AddType<PersonQuery>()
-    .AddType<CompanyQuery>()
-    .AddNeo4JFiltering()
-    .AddNeo4JSorting()
-    .AddNeo4JProjections();
+    .AddType<CompanyQuery>();
 
 
 

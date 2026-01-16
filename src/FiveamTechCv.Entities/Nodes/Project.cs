@@ -1,4 +1,4 @@
-﻿using FiveamTechCv.Entities.Attributes;
+﻿﻿using FiveamTechCv.Entities.Attributes;
 using HotChocolate.Data.Neo4J;
 
 namespace FiveamTechCv.Entities.Nodes;
@@ -16,7 +16,7 @@ public class Project : BaseNode
     [Neo4JRelationship("HAS_TAG")]
     [NodeRelationship("HAS_TAG", NodeRelationType.Link)]
     [ParameterType(ParameterTypes.Ignore)]
-    public List<Tag>? Tags { get; set; }
+    public virtual List<Tag>? Tags { get; set; }
     
     // To Tag
     public const string HAS_TAG = "HAS_TAG";

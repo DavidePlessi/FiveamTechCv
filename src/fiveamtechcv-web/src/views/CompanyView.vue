@@ -5,7 +5,7 @@
     </cyber-header>
 
     <generic-list
-      :items="items"
+      :items="filteredItems"
       :headers="headers"
       :loading="loading"
       :filter-schema="filterSchema"
@@ -86,15 +86,46 @@ import CyberHeader from '@/components/shared/CyberHeader.vue';
 import type { Company, FormSchema } from '@/types/entities';
 import { companyService } from '@/services/companyService';
 import { useAuthStore } from '@/stores/auth';
+import { useContextStore } from '@/stores/context';
 
 const { mobile } = useDisplay();
 const authStore = useAuthStore();
+const contextStore = useContextStore();
 const items = ref<Company[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
 const detailDialog = ref(false);
 const editedItem = ref<Company>({});
 const detailItem = ref<Company>({});
+
+const filteredItems = computed(() => {
+    if (!contextStore.selectedPersonId) {
+        return items.value;
+    }
+    const person = contextStore.people.find(p => p.id === contextStore.selectedPersonId);
+    if (!person || !person.workExperiences) return [];
+
+    const companyNames = new Set<string>();
+    const companyIds = new Set<string>();
+
+    person.workExperiences.forEach(we => {
+        if (we.company) {
+            // Check if company is string (legacy/simple) or object
+            if (typeof we.company === 'string') {
+                companyNames.add(we.company);
+            } else {
+                 if (we.company.id) companyIds.add(we.company.id);
+                 if (we.company.name) companyNames.add(we.company.name);
+            }
+        }
+    });
+
+    return items.value.filter(c => {
+        if (c.id && companyIds.has(c.id)) return true;
+        if (c.name && companyNames.has(c.name)) return true;
+        return false;
+    });
+});
 
 const headers = computed(() => {
   return [
