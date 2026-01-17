@@ -83,6 +83,10 @@ public static class Extensions
             {
                 value = ((ZonedDateTime)value).ToDateTimeOffset();
             }
+            if (value is LocalDateTime)
+            {
+                value = ((LocalDateTime)value).ToDateTime();
+            }
             data.Add(typeProperty.Name, value);
             
         }
@@ -130,6 +134,10 @@ public static class Extensions
             {
                 value = ((ZonedDateTime)value).ToDateTimeOffset();
             }
+            if (value is LocalDateTime)
+            {
+                value = ((LocalDateTime)value).ToDateTime();
+            }
             data.Add(typeProperty.Name, value);
         }
         var json = JsonSerializer.Serialize(data);
@@ -161,6 +169,11 @@ public static class Extensions
              
             if(value is Enum)
                 value = value.ToString();
+            
+            if (value is DateTime dateTime)
+            {
+                value = new LocalDateTime(dateTime);
+            }
             
             dictionary.Add(prop.Name, value);
         }

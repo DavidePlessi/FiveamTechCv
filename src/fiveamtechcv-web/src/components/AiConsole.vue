@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { aiService } from '@/services/aiService';
 import { parseMarkdown } from '@/utils/markdown';
+import { v4 as uuidv4 } from 'uuid';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -51,16 +52,18 @@ const messages = ref<{ text: string; isUser: boolean }[]>([
   { text: 'Welcome to System AI. How can I assist you today?', isUser: false }
 ]);
 const HISTORY_KEY = 'fiveamtech_ai_history'; // Key for localStorage
+const SESSION_ID_KEY = 'fiveamtech_ai_session_id'; // Key for session id
 const userInput = ref('');
 const isLoading = ref(false);
 const isRecaptchaLoading = ref(false);
 const chatBody = ref<HTMLElement | null>(null);
 const inputField = ref<HTMLInputElement | null>(null);
 const overlayRef = ref<HTMLElement | null>(null);
+const sessionId = ref('');
 
 const handleVisualViewportResize = () => {
     if (!overlayRef.value || !window.visualViewport) return;
-    
+
     // Adjust height to match visual viewport (visible area above keyboard)
     overlayRef.value.style.height = `${window.visualViewport.height}px`;
     // On mobile, sometimes top offset is needed if scrolled
@@ -99,6 +102,14 @@ onMounted(() => {
   }
    scrollToBottom();
 
+   // Load or create Session ID
+   let savedSessionId = localStorage.getItem(SESSION_ID_KEY);
+   if (!savedSessionId) {
+       savedSessionId = uuidv4();
+       localStorage.setItem(SESSION_ID_KEY, savedSessionId);
+   }
+   sessionId.value = savedSessionId;
+
    // Load reCAPTCHA script
     const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
     if (siteKey && !document.getElementById('recaptcha-script')) {
@@ -110,7 +121,7 @@ onMounted(() => {
         document.head.appendChild(script);
         document.head.appendChild(script);
     }
-    
+
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', handleVisualViewportResize);
         window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
@@ -155,7 +166,7 @@ const sendMessage = async () => {
 
   try {
     isRecaptchaLoading.value = true;
-    
+
     let token = '';
     // @ts-ignore
     if (window.grecaptcha) {
@@ -174,19 +185,19 @@ const sendMessage = async () => {
         // Handle failure to load reCAPTCHA - maybe proceed without token and let backend reject?
         // Or show error. For now, proceeding with empty token which will fail backend check.
     }
-    
+
     isRecaptchaLoading.value = false;
 
     // Construct history for context (last 10 interactions)
     // We filter out the current question we just added (though it's already in messages)
-    // Actually, 'messages' already includes the new question at the end. 
+    // Actually, 'messages' already includes the new question at the end.
     // We want to send the previous context.
-    const historyContext: string[] = messages.value
+    const historyContext = messages.value
         .slice(0, messages.value.length - 1) // Exclude the current question we just pushed
         .slice(-10) // Take last 10
-        .map(m => (m.isUser ? `User: ${m.text}` : `System: ${m.text}`));
+        .map(m => ({role: m.isUser ? 'user' : 'system', text: m.text}));
 
-    const answer = await aiService.ask(question, historyContext, token);
+    const answer = await aiService.ask(question, historyContext, sessionId.value, token);
     messages.value.push({ text: answer, isUser: false });
   } catch (error) {
     console.error('Error:', error);

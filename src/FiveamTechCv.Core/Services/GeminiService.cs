@@ -3,12 +3,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FiveamTechCv.Abstract.Services;
 using Microsoft.Extensions.Configuration;
+using Google.GenAI;
+using Google.GenAI.Types;
 
 namespace FiveamTechCv.Core.Services;
 
 public class GeminiService : IGeminiService
 {
-    private readonly HttpClient _httpClient;
+    private readonly Client _geminiClient;
     private readonly string _apiKey;
     
     // Current Stable Models
@@ -21,102 +23,74 @@ public class GeminiService : IGeminiService
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public GeminiService(HttpClient httpClient, IConfiguration configuration)
+    public GeminiService(IConfiguration configuration)
     {
-        _httpClient = httpClient;
         _apiKey = configuration["Gemini:ApiKey"] ?? throw new ArgumentNullException("Gemini:ApiKey is missing");
         
-        // Updated to use the v1beta base address for newer models
-        if (_httpClient.BaseAddress == null)
-        {
-            _httpClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
-        }
+        _geminiClient = new Client(apiKey:_apiKey);
     }
 
-    public async Task<List<float>> GenerateEmbeddingAsync(string text)
+    public async Task<List<double>> GenerateEmbeddingAsync(string text)
     {
-        var requestUrl = $"v1beta/models/{EmbeddingModel}:embedContent?key={_apiKey}";
+        var response = await _geminiClient.Models.EmbedContentAsync(
+            EmbeddingModel,
+            text
+        );
         
-        var payload = new
-        {
-            model = $"models/{EmbeddingModel}",
-            content = new { parts = new[] { new { text } } }
-        };
-
-        using var response = await _httpClient.PostAsJsonAsync(requestUrl, payload, JsonOptions);
-        
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException($"Gemini API Error (Embedding): {response.StatusCode} - {error}");
-        }
-
-        var result = await response.Content.ReadFromJsonAsync<EmbeddingResponse>(JsonOptions);
-        return result?.Embedding?.Values ?? [];
+        return (
+            response.Embeddings == null
+                ? throw new InvalidOperationException("API returned an empty response.") 
+                : response.Embeddings[0].Values) ?? throw new InvalidOperationException("API returned an empty response."
+        );
     }
 
-    public async Task<string> GenerateResponseAsync(string prompt)
+    public async Task<string> GenerateResponseAsync(string systemPrompt, List<ChatMessage> history, string prompt)
     {
-        var requestUrl = $"v1/models/{GenerationModel}:generateContent?key={_apiKey}";
-        
-        var payload = new
+        // Add history
+        // var historyContent = new List<Content>();
+        //  var userHistory = history.Where(x => x.Role == "user").Select(x => new Part { Text = x.Text}).ToList();
+        //  if (userHistory.Count > 0)
+        //  {
+        //      historyContent.Add(new Content
+        //      {
+        //          Role = "user",
+        //          Parts = userHistory
+        //      });
+        //  }
+        //
+        //  var assistantHistory = history.Where(x => x.Role == "system").Select(x => new Part { Text = x.Text}).ToList();
+        //  if (assistantHistory.Count > 0)
+        //  {
+        //      historyContent.Add(new Content
+        //      {
+        //          Role = "assistant",
+        //          Parts = assistantHistory
+        //      });
+        //  }
+        var historyContent = history.Select(x => new Content
         {
-            contents = new[] 
-            { 
-                new { parts = new[] { new { text = prompt } } } 
-            }
-        };
+            Role = x.Role == "system" ? "model" : "user",
+            Parts = [new Part { Text = x.Text }]
+        }).ToList();
 
-        using var response = await _httpClient.PostAsJsonAsync(requestUrl, payload, JsonOptions);
-        
-        if (!response.IsSuccessStatusCode)
+        // Add current prompt
+        historyContent.Add(new Content
+        { 
+            Role = "user",
+            Parts = new List<Part> { new() { Text = prompt } } 
+        });
+
+        var config = new GenerateContentConfig
         {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            
-            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            SystemInstruction = new Content
             {
-                // Try to parse the error to see if it's RPM or RPD
-                // The error format from Gemini usually contains details in JSON
-                // Example: { "error": { "code": 429, "message": "Resource has been exhausted (e.g. check quota).", "status": "RESOURCE_EXHAUSTED" } }
-                // Sometimes the message contains "RPM" or "RPD" or "TPM"
-                
-                string userMessage = "I'm currently receiving too many requests. Please try again tomorrow.";
-                
-                if (errorContent.Contains("RPM", StringComparison.OrdinalIgnoreCase) || 
-                    errorContent.Contains("requests per minute", StringComparison.OrdinalIgnoreCase))
-                {
-                    userMessage = "I'm a bit overwhelmed right now (RPM limit). Please give me a minute to catch my breath.";
-                }
-                else if (errorContent.Contains("RPD", StringComparison.OrdinalIgnoreCase) || 
-                         errorContent.Contains("requests per day", StringComparison.OrdinalIgnoreCase))
-                {
-                    userMessage = "I've reached my daily limit of thoughts (RPD limit). Please come back tomorrow!";
-                }
-                else if (errorContent.Contains("TPM", StringComparison.OrdinalIgnoreCase) || 
-                         errorContent.Contains("tokens per minute", StringComparison.OrdinalIgnoreCase))
-                {
-                     userMessage = "That was a lot to process at once (TPM limit). Please try a shorter question or wait a moment.";
-                }
-
-                // Return the friendly message instead of throwing, so the UI can display it
-                return userMessage;
+                Parts = new List<Part> { new() { Text = systemPrompt } }
             }
-
-            throw new HttpRequestException($"Gemini API Error (Generation): {response.StatusCode} - {errorContent}");
-        }
-
-        var result = await response.Content.ReadFromJsonAsync<GenerationResponse>(JsonOptions);
+        };
         
-        return result?.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text 
+        
+        var response = await _geminiClient.Models.GenerateContentAsync(GenerationModel, historyContent, config);
+        return response.Candidates?.FirstOrDefault()?.Content?.Parts?.FirstOrDefault()?.Text 
                ?? throw new InvalidOperationException("API returned an empty response.");
     }
-
-    #region DTOs
-    private record EmbeddingResponse(EmbeddingData? Embedding);
-    private record EmbeddingData(List<float>? Values);
-    private record GenerationResponse(List<Candidate>? Candidates);
-    private record Candidate(Content? Content);
-    private record Content(List<Part>? Parts);
-    private record Part(string? Text);
-    #endregion
 }

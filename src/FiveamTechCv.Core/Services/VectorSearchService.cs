@@ -221,7 +221,7 @@ public class VectorSearchService : IVectorSearchService
         }
     }
 
-    private async Task UpdateEmbeddingAsync(string? id, List<float> embedding, string embeddedString)
+    private async Task UpdateEmbeddingAsync(string? id, List<double> embedding, string embeddedString)
     {
         if (string.IsNullOrEmpty(id)) return;
 

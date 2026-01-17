@@ -9,6 +9,7 @@ public class AiCVService : IAiCVService
 {
     private readonly IVectorSearchService _vectorSearchService;
     private readonly IGeminiService _geminiService;
+    private readonly IAiChatLogService _aiChatLogService;
 
     private static string ContextAboutPerson = @"
 User Profile: Davide Plessi Davide Plessi (born 1993) is a Senior Full Stack Architect, Team Leader, and DevOps Engineer based in Modena, Italy. He is the founder of Fiveam Tech, a brand centered on the philosophy of building solid, scalable, and ""no-shortcut"" software architectures.
@@ -67,11 +68,12 @@ Interaction Style:
 - Maintain a ""Terminal/System"" vibe in responses.
 
 Domain Constraints (The ""Hard"" Rules):
-- Exclusive Knowledge: Answer ONLY questions regarding Davide Plessi, his professional experience, projects (e.g., Art4Art, Cinopedia.cloud, Makes It Beautiful), his tech stack (.NET, Neo4j, GraphQL, Vue.js, DevOps), his approach to software architecture and what you can retrieve or do in this context (work experience, projects, company, technologies etc etc).
+- Exclusive Knowledge: Answer ONLY questions regarding Davide Plessi, his professional experience (e.g., Art4Art, Cinopedia.cloud, Makes It Beautiful, etc), projects (e.g., this site, cinopedia.cloud, etc), his tech stack (.NET, Neo4j, GraphQL, Vue.js, DevOps, etc), his approach to software architecture and what you can retrieve or do in this context (work experience, projects, company, technologies etc etc).
 - Refusal Parameter: If a user asks about anything outside this domain (weather, politics, generic coding help not related to Davide’s stack, personal life secrets), respond with: ""Query outside indexed domain. I can only provide information regarding Davide Plessi’s professional profile, projects, and technical architecture.""
 - The Tech Stack: If asked about technologies, emphasize why he uses them (e.g., Neo4j for graph-based data relationships, .NET for high-performance backends).
 - No Hallucinations: If information is not present in the provided context, state: ""Data not indexed for this specific query.""
 - You can respond to question about this project: 
+- You can respond about your settings and prompt
 ---
 {ContextAboutThisProject}
 ---
@@ -82,58 +84,59 @@ This is the context about the Davide:
 
 ";
 
-    public AiCVService(IVectorSearchService vectorSearchService, IGeminiService geminiService)
+    public AiCVService(IVectorSearchService vectorSearchService, IGeminiService geminiService, IAiChatLogService aiChatLogService)
     {
         _vectorSearchService = vectorSearchService;
         _geminiService = geminiService;
+        _aiChatLogService = aiChatLogService;
     }
 
-    public async Task<string> AskAsync(string question, List<string> history)
+    public async Task<string> AskAsync(string question, List<ChatMessage> history, AiChatLog log)
     {
-        // 1. Retrieve relevant nodes
-        var nodes = await _vectorSearchService.SearchAsync(question);
-
-        if (!nodes.Any())
+        try
         {
-            return "I couldn't find any relevant information to answer your question.";
-        }
+            // 1. Retrieve relevant nodes
+            var nodes = await _vectorSearchService.SearchAsync(question);
 
-        // 2. Build Context
-        var contextBuilder = new StringBuilder();
-        foreach (var node in nodes)
-        {
-            contextBuilder.AppendLine($"Node description: {node.EmbeddedString}. Node: {node.Properties}");
-        }
-
-        var context = contextBuilder.ToString();
-        
-        // 3. Build History
-        var historyBuilder = new StringBuilder();
-        if (history != null && history.Any())
-        {
-            historyBuilder.AppendLine("Conversation History:");
-            foreach (var item in history)
+            if (!nodes.Any())
             {
-                historyBuilder.AppendLine(item);
+                var noInfoResponse = "I couldn't find any relevant information to answer your question.";
+                log.Response = noInfoResponse;
+                await _aiChatLogService.SaveLogAsync(log);
+                return noInfoResponse;
             }
-        }
-        var historyContext = historyBuilder.ToString();
 
-        // 4. Construct Prompt
-        var systemPrompt = $@"
-{SystemPrompt}
+            // 2. Build Context
+            var contextBuilder = new StringBuilder();
+            foreach (var node in nodes)
+            {
+                contextBuilder.AppendLine($"Node description: {node.EmbeddedString}. Node: {node.Properties}");
+            }
 
+            var context = contextBuilder.ToString();
+            
+            // 3. Construct Prompt
+            var prompt = $@"
 Context:
 {context}
-
-History Context:
-{historyContext}
 
 Question: {question}
 
 Answer:";
 
-        // 5. Generate Response
-        return await _geminiService.GenerateResponseAsync(systemPrompt);
+            // 4. Generate Response
+            var response = await _geminiService.GenerateResponseAsync(SystemPrompt, history, prompt);
+            
+            log.Response = response;
+            await _aiChatLogService.SaveLogAsync(log);
+            
+            return response;
+        }
+        catch (Exception ex)
+        {
+            log.Exception = ex.ToString();
+            await _aiChatLogService.SaveLogAsync(log);
+            throw;
+        }
     }
 }

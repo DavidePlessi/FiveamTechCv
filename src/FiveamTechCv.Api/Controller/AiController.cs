@@ -1,5 +1,6 @@
 using FiveamTechCv.Abstract.Services;
 using FiveamTechCv.Api.Attributes;
+using FiveamTechCv.Entities.Nodes;
 using HotChocolate.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,9 +28,18 @@ public class AiController : ControllerBase
             return BadRequest("Question is required.");
         }
 
+        var log = new AiChatLog
+        {
+            SessionId = request.SessionId,
+            CreationDateTime = DateTimeOffset.UtcNow,
+            UserAgent = Request.Headers["User-Agent"].ToString(),
+            IpAddress = GetClientIpAddress(),
+            Message = request.Question
+        };
+
         try 
         {
-            var answer = await _aiService.AskAsync(request.Question, request.History);
+            var answer = await _aiService.AskAsync(request.Question, request.History, log);
             return Ok(new { Answer = answer });
         }
         catch (Exception ex)
@@ -102,12 +112,29 @@ public class AiController : ControllerBase
             return StatusCode(500, "An error occurred while searching.");
         }
     }
+
+    private string GetClientIpAddress()
+    {
+        if (Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+        {
+            var ip = forwardedFor.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(ip))
+            {
+                // X-Forwarded-For can contain multiple IPs (client, proxy1, proxy2...).
+                // The first one is the client IP.
+                return ip.Split(',')[0].Trim();
+            }
+        }
+
+        return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+    }
 }
 
 public class AskRequest
 {
     public string? Question { get; set; }
-    public List<string> History { get; set; } = new();
+    public List<ChatMessage> History { get; set; } = new();
+    public string SessionId { get; set; }
 }
 
 public class SearchRequest
