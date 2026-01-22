@@ -1,6 +1,6 @@
 # 📄 FiveamTechCv
 
-![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat&logo=dotnet)
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat&logo=dotnet)
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?style=flat&logo=vue.js)
 ![Neo4j](https://img.shields.io/badge/Neo4j-Database-008CC1?style=flat&logo=neo4j)
 ![Status](https://img.shields.io/badge/Status-WIP-orange)
@@ -26,7 +26,7 @@
 
 ## 🛠️ Tech Stack
 
-- **Backend**: .NET 8
+- **Backend**: .NET 10
 - **Frontend**: Vue 3
 - **Database**: Neo4j (Graph Database)
 
@@ -36,7 +36,7 @@
 
 Before you begin, ensure you have the following installed:
 
-- **[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)**
+- **[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)**
 - **[Node.js](https://nodejs.org/)** (v20 or later)
 - **[Neo4j Database](https://neo4j.com/download/)** (Community or Enterprise Edition)
 

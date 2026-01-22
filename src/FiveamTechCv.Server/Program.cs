@@ -1,6 +1,4 @@
-using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
 using FiveamTechCv.Abstract.Services;
 using FiveamTechCv.Core;
 using FiveamTechCv.Core.Services;
@@ -10,7 +8,7 @@ using FiveamTechCv.Server.Middlewares;
 using HotChocolate.Data.Neo4J;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Neo4j.Driver;
 using ServiceStack;
 using ServiceStack.Text;
@@ -99,19 +97,13 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
         Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
-
-        Reference = new OpenApiReference
-        {
-            Id = JwtBearerDefaults.AuthenticationScheme,
-            Type = ReferenceType.SecurityScheme
-        }
     };
 
-    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, jwtSecurityScheme);
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        { jwtSecurityScheme, Array.Empty<string>() }
+        [new OpenApiSecuritySchemeReference("bearer", document)] = []
     });
 });
 
