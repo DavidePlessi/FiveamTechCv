@@ -200,18 +200,18 @@ onMounted(async () => {
             workExperienceService.getAll()
         ]);
         people.value = fetchedPeople;
-        
+
         projects.value = fetchedProjects.map(p => ({ text: p.name, value: p.id }));
         tags.value = fetchedTags.map(t => ({ text: t.name, value: t.id }));
-        workExperiences.value = fetchedWorkExperiences.map(w => ({ text: `${w.company} - ${w.position}`, value: w.id }));
+        workExperiences.value = fetchedWorkExperiences.map(w => ({ text: `${w.company?.name || ''} - ${w.position}`, value: w.id }));
 
         // Update Schema Options
         const projectField = personSchema.value.fields.find(f => f.key === 'projectIdsToLink');
         if (projectField) projectField.options = projects.value;
-        
+
         const tagField = personSchema.value.fields.find(f => f.key === 'tagIdsToLink');
         if (tagField) tagField.options = tags.value;
-        
+
         const workExpField = personSchema.value.fields.find(f => f.key === 'workExperienceIdsToLink');
         if (workExpField) workExpField.options = workExperiences.value;
 
@@ -229,7 +229,7 @@ const openDialog = (item?: Person) => {
     if (item.projects) editedItem.value.projectIdsToLink = item.projects.map(p => p.id!);
     if (item.tags) editedItem.value.tagIdsToLink = item.tags.map(t => t.id!);
     if (item.workExperiences) editedItem.value.workExperienceIdsToLink = item.workExperiences.map(w => w.id!);
-    
+
     // Ensure arrays are initialized
     if (!editedItem.value.info) editedItem.value.info = [];
     if (!editedItem.value.summary) editedItem.value.summary = [];
@@ -237,9 +237,9 @@ const openDialog = (item?: Person) => {
     if (!editedItem.value.slogan) editedItem.value.slogan = [];
 
   } else {
-    editedItem.value = { 
-        info: [], summary: [], mindset: [], slogan: [], 
-        projectIdsToLink: [], tagIdsToLink: [], workExperienceIdsToLink: [] 
+    editedItem.value = {
+        info: [], summary: [], mindset: [], slogan: [],
+        projectIdsToLink: [], tagIdsToLink: [], workExperienceIdsToLink: []
     };
   }
   dialog.value = true;
@@ -251,11 +251,11 @@ const closeDialog = () => {
 
 const openDetail = (item: Person) => {
     detailItem.value = JSON.parse(JSON.stringify(item));
-    
+
     if (item.projects) detailItem.value.projectIdsToLink = item.projects.map(p => p.id!);
     if (item.workExperiences) detailItem.value.workExperienceIdsToLink = item.workExperiences.map(w => w.id!);
     if (item.tags) detailItem.value.tagIdsToLink = item.tags.map(t => t.id!);
-    
+
     detailDialog.value = true;
 };
 

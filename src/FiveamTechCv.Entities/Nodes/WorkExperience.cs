@@ -54,7 +54,7 @@ public class WorkExperience : BaseVectorizableNode
     // To Company
     public const string HAS_COMPANY = "HAS_COMPANY";
 
-    public string? GetContentToEmbed()
+    public override string? GetContentToEmbed()
     {
         var desc = string.Join(". ", Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
         var companies = string.Join(", ", Companies?.Select(c => c.Name).Where(c => !string.IsNullOrEmpty(c)) ?? Array.Empty<string>());

@@ -28,7 +28,7 @@ public class Project : BaseVectorizableNode
     [ParameterType(ParameterTypes.Ignore)]
     public List<Person>? People { get; set; }
 
-    public string? GetContentToEmbed()
+    public override string? GetContentToEmbed()
     {
         var desc = string.Join(". ", Description?.Select(d => d.Value).Where(v => !string.IsNullOrEmpty(v)) ?? Array.Empty<string>());
         var people = string.Join(", ", People?.Select(p => $"{p.Name} {p.LastName}").Where(n => !string.IsNullOrWhiteSpace(n)) ?? Array.Empty<string>());

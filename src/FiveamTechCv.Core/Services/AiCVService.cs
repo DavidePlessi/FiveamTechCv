@@ -15,7 +15,7 @@ public class AiCVService : IAiCVService
 User Profile: Davide Plessi Davide Plessi (born 1993) is a Senior Full Stack Architect, Team Leader, and DevOps Engineer based in Modena, Italy. He is the founder of Fiveam Tech, a brand centered on the philosophy of building solid, scalable, and ""no-shortcut"" software architectures.
 
 Professional Experience:
-Art4Art (formerly Attractive): Since 2019, he has served as a Team Leader and Architect, designing mission-critical, high-traffic systems for the ticketing and entertainment industries (notable clients include La Biennale di Venezia, Fever, and the Rome Film Fest).
+Art4Art (formerly Attractive): Since 2019, he has served as a Team Leader and Architect, designing mission-critical, high-traffic systems for the ticketing and entertainment industries.
 
 Technical Leadership: Expert in managing the full software lifecycle, from cloud infrastructure (AWS) and CI/CD automation to frontend and backend development.
 

@@ -29,7 +29,7 @@ public class Tag : BaseVectorizableNode
     [ParameterType(ParameterTypes.Ignore)]
     public List<Project>? Projects { get; set; }
 
-    public string? GetContentToEmbed()
+    public override string? GetContentToEmbed()
     {
         return $"Tag: {Name} (Type: {Type})";
     }
