@@ -14,7 +14,7 @@ public class GeminiService : IGeminiService
     private readonly string _apiKey;
     
     // Current Stable Models
-    private const string EmbeddingModel = "text-embedding-004"; 
+    private const string EmbeddingModel = "gemini-embedding-2"; 
     private const string GenerationModel = "gemini-2.5-flash";
 
     private static readonly JsonSerializerOptions JsonOptions = new()

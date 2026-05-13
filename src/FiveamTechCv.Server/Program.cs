@@ -91,7 +91,7 @@ builder.Services.AddSwaggerGen(c =>
 
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
-        Scheme = "bearer",
+        Scheme = "Bearer",
         BearerFormat = "JWT",
         Name = "JWT Authentication",
         In = ParameterLocation.Header,
@@ -103,7 +103,7 @@ builder.Services.AddSwaggerGen(c =>
 
     c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        [new OpenApiSecuritySchemeReference("bearer", document)] = []
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
 

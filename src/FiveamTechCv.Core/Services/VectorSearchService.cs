@@ -91,13 +91,16 @@ public class VectorSearchService : IVectorSearchService
     public async Task CreateIndexAsync()
     {
         await _driver.ExecutableQuery(
+            "DROP INDEX vector_index IF EXISTS;"
+        ).WithConfig(_queryConfig).ExecuteAsync();        
+        await _driver.ExecutableQuery(
             @"CREATE VECTOR INDEX vector_index IF NOT EXISTS
-              FOR (n:Vectorizable)
-              ON (n.Embedding)
-              OPTIONS {indexConfig: {
-               `vector.dimensions`: 768,
-               `vector.similarity_function`: 'cosine'
-              }}"
+  FOR (n:Vectorizable)
+  ON (n.Embedding)
+  OPTIONS {indexConfig: {
+   `vector.dimensions`: 3072,
+   `vector.similarity_function`: 'cosine'
+  }}"
         ).WithConfig(_queryConfig).ExecuteAsync();
     }
 
